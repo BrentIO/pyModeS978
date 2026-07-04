@@ -12,6 +12,25 @@ _AIRGROUND_STRINGS = {0: "airborne", 1: "airborne", 2: "ground", 3: "reserved"}
 _TRACK_TYPES = {1: "track", 2: "magnetic_heading", 3: "true_heading"}
 _TISB_ADDRESS_QUALIFIERS = {2, 3}
 
+FIELDS = (
+    "latitude",
+    "longitude",
+    "altitude",
+    "altitude_type",
+    "nic",
+    "airground_state",
+    "groundspeed",
+    "track",
+    "track_type",
+    "vertical_rate",
+    "vertical_rate_source",
+    "length",
+    "width",
+    "position_offset",
+    "utc_coupled",
+    "tisb_site_id",
+)
+
 
 def decode(payload: bytes, address_qualifier: AddressQualifier | int) -> dict:
     nic = read_uint(payload, 92, 4)

@@ -3,6 +3,25 @@ from ._enums import Emergency, EmitterCategory, coerce
 
 _BASE40_ALPHABET = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ  .."
 
+FIELDS = (
+    "emitter_category",
+    "callsign",
+    "squawk",
+    "emergency",
+    "uat_version",
+    "sil",
+    "transmit_mso",
+    "nac_p",
+    "nac_v",
+    "nic_baro",
+    "has_cdti",
+    "has_acas",
+    "acas_ra_active",
+    "ident_active",
+    "atc_services",
+    "heading_type",
+)
+
 
 def _base40_chars(raw16: int) -> str:
     return (
