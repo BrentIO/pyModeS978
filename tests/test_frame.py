@@ -1,3 +1,4 @@
+from pyModeS978._enums import AddressQualifier, PayloadType
 from pyModeS978._frame import ParsedFrame, parse
 
 # payload_type=1 (00001), address_qualifier=0 (000) -> byte0 = 0000_1000 = 0x08
@@ -17,6 +18,20 @@ def test_short_downlink_no_prefix():
         address_qualifier=0,
         icao="ABCDEF",
     )
+
+
+def test_payload_type_and_address_qualifier_are_named_enums():
+    result = parse(_SHORT_DOWNLINK)
+    assert result.payload_type is PayloadType.LONG
+    assert result.address_qualifier is AddressQualifier.ADSB_ICAO
+
+
+def test_unrecognized_payload_type_falls_back_to_plain_int():
+    # payload_type=4 (00100), address_qualifier=0 (000) -> byte0 = 0010_0000 = 0x20
+    hdr = "20ABCDEF" + "00" * 14
+    result = parse(hdr)
+    assert result.payload_type == 4
+    assert not isinstance(result.payload_type, PayloadType)
 
 
 def test_short_downlink_with_prefix():
