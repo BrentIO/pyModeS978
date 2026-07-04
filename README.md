@@ -6,7 +6,7 @@ support and no Python UAT decoder exists elsewhere, so this library implements t
 ## Status
 
 Under active development — the public API below is not implemented yet (tracked in
-[#3](https://github.com/BrentIO/pyModeS978/issues/3)–[#6](https://github.com/BrentIO/pyModeS978/issues/6)).
+[#4](https://github.com/BrentIO/pyModeS978/issues/4)–[#6](https://github.com/BrentIO/pyModeS978/issues/6)).
 Not yet published to PyPI.
 
 ## Install
@@ -19,8 +19,6 @@ pip install pyModeS978
 
 ```python
 import pyModeS978
-
-pyModeS978.filter_uplink = True   # module-level default
 
 result = pyModeS978.decode(raw)   # dict | None
 # {
@@ -45,7 +43,8 @@ result = pyModeS978.decode(raw)   # dict | None
 ```
 
 `raw` is accepted with or without the dump978-fa direction prefix (`-` = downlink, `+` = uplink); trailing
-`;metadata` is stripped if present.
+`;metadata` is stripped if present. Uplink frames (FIS-B weather/NOTAM broadcasts, not traffic data) always
+decode to `None` — see [#1](https://github.com/BrentIO/pyModeS978/issues/1) for why.
 
 ## License
 
