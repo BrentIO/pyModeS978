@@ -2,6 +2,7 @@ import re
 from dataclasses import dataclass
 
 from ._bits import read_uint
+from ._enums import AddressQualifier, PayloadType, coerce
 
 _DOWNLINK_LENGTHS = {18, 34}
 _UPLINK_LENGTH = 432
@@ -13,8 +14,8 @@ _HEX_RE = re.compile(r"^[0-9A-Fa-f]+$")
 class ParsedFrame:
     direction: str
     payload: bytes
-    payload_type: int
-    address_qualifier: int
+    payload_type: PayloadType | int
+    address_qualifier: AddressQualifier | int
     icao: str
 
 
@@ -48,8 +49,8 @@ def parse(raw: str) -> ParsedFrame | None:
     if direction == "uplink":
         return None
 
-    payload_type = read_uint(payload, 0, 5)
-    address_qualifier = read_uint(payload, 5, 3)
+    payload_type = coerce(PayloadType, read_uint(payload, 0, 5))
+    address_qualifier = coerce(AddressQualifier, read_uint(payload, 5, 3))
     icao = f"{read_uint(payload, 8, 24):06X}"
 
     return ParsedFrame(

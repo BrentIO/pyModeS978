@@ -23,14 +23,14 @@ _GROUND_HEX = "00000000000000000000000980CDC13C0500"
 
 def test_airborne_position_altitude_velocity():
     result = decode(bytes.fromhex(_AIRBORNE_HEX), address_qualifier=0)
-    assert result["latitude"] == pytest.approx(25.599989891052246)
-    assert result["longitude"] == pytest.approx(142.40000009536743)
+    assert result["latitude"] == pytest.approx(25.59999)
+    assert result["longitude"] == pytest.approx(142.4)
     assert result["altitude"] == 23975
     assert result["altitude_type"] == "baro"
     assert result["nic"] == 8
     assert result["airground_state"] == "airborne"
-    assert result["groundspeed"] == pytest.approx(math.sqrt(100**2 + 50**2))
-    assert result["track"] == pytest.approx(333.434948822922)
+    assert result["groundspeed"] == round(math.sqrt(100**2 + 50**2))
+    assert result["track"] == 333
     assert result["track_type"] == "track"
     assert result["vertical_rate"] == 640
     assert result["vertical_rate_source"] == "baro"
@@ -75,7 +75,7 @@ def test_ground_speed_track_and_dimensions():
     result = decode(bytes.fromhex(_GROUND_HEX), address_qualifier=0)
     assert result["airground_state"] == "ground"
     assert result["groundspeed"] == 50
-    assert result["track"] == pytest.approx(271.40625)
+    assert result["track"] == 271
     assert result["track_type"] == "track"
     assert result["length"] == 85
     assert result["width"] == 45
@@ -107,8 +107,8 @@ def test_supersonic_velocity_multiplier():
     result = decode(payload, address_qualifier=0)
     assert result["airground_state"] == "airborne"
     # magnitude 11 -> 10 kt, x4 for supersonic -> 40 kt on each axis
-    assert result["groundspeed"] == pytest.approx(math.sqrt(40**2 + 40**2))
-    assert result["track"] == pytest.approx(45.0)  # equal N/S and E/W -> 45 degrees
+    assert result["groundspeed"] == round(math.sqrt(40**2 + 40**2))
+    assert result["track"] == 45  # equal N/S and E/W -> 45 degrees
 
 
 def test_ground_invalid_track_type_code():

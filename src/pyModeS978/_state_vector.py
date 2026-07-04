@@ -1,6 +1,7 @@
 import math
 
 from ._bits import read_uint
+from ._enums import AddressQualifier
 
 # ADS-B aircraft length/width code table (DO-260/DO-282), meters.
 _DIMENSIONS_WIDTHS_M = [
@@ -12,7 +13,7 @@ _TRACK_TYPES = {1: "track", 2: "magnetic_heading", 3: "true_heading"}
 _TISB_ADDRESS_QUALIFIERS = {2, 3}
 
 
-def decode(payload: bytes, address_qualifier: int) -> dict:
+def decode(payload: bytes, address_qualifier: AddressQualifier | int) -> dict:
     nic = read_uint(payload, 92, 4)
     raw_lat = read_uint(payload, 32, 23)
     raw_lon = read_uint(payload, 55, 24)
@@ -56,14 +57,14 @@ def decode(payload: bytes, address_qualifier: int) -> dict:
         utc_coupled = bool(read_uint(payload, 132, 1))
 
     return {
-        "latitude": latitude,
-        "longitude": longitude,
+        "latitude": latitude if latitude is None else round(latitude, 6),
+        "longitude": longitude if longitude is None else round(longitude, 6),
         "altitude": altitude,
         "altitude_type": altitude_type,
         "nic": nic,
         "airground_state": airground_state,
-        "groundspeed": groundspeed,
-        "track": track,
+        "groundspeed": groundspeed if groundspeed is None else round(groundspeed),
+        "track": track if track is None else round(track),
         "track_type": track_type,
         "vertical_rate": vertical_rate,
         "vertical_rate_source": vertical_rate_source,
