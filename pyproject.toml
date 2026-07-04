@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "pyModeS978"
-version = "0.1.0.dev0"
+version = "9999.99.99"
 description = "Pure-Python decoder for UAT (978 MHz) frames"
 readme = "README.md"
 license = "MIT"
