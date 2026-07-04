@@ -5,9 +5,9 @@ support and no Python UAT decoder exists elsewhere, so this library implements t
 
 ## Status
 
-Under active development — the public API below is not implemented yet (tracked in
-[#4](https://github.com/BrentIO/pyModeS978/issues/4)–[#6](https://github.com/BrentIO/pyModeS978/issues/6)).
-Not yet published to PyPI.
+Core decoding (HDR, State Vector, Mode Status, AUX SV) is implemented. Test coverage against real-world
+captures (#7/#8) and PyPI publishing (#9) are still open. See the
+[issue tracker](https://github.com/BrentIO/pyModeS978/issues) for what's left.
 
 ## Install
 
@@ -21,30 +21,60 @@ pip install pyModeS978
 import pyModeS978
 
 result = pyModeS978.decode(raw)   # dict | None
-# {
-#   'payload_type': 1,
-#   'address_qualifier': 0,
-#   'icao': '28C4F1',
-#   'latitude': 33.6423,
-#   'longitude': -84.4210,
-#   'altitude': 37000,
-#   'altitude_type': 'baro',
-#   'nic': 8,
-#   'airground_state': 'airborne',
-#   'groundspeed': 447,
-#   'track': 271.4,
-#   'vertical_rate': -640,
-#   'callsign': 'DAL2',
-#   'squawk': None,
-#   'emitter_category': 'A3',
-#   'emergency': None,
-#   'direction': 'downlink',
-# }
 ```
 
 `raw` is accepted with or without the dump978-fa direction prefix (`-` = downlink, `+` = uplink); trailing
 `;metadata` is stripped if present. Uplink frames (FIS-B weather/NOTAM broadcasts, not traffic data) always
 decode to `None` — see [#1](https://github.com/BrentIO/pyModeS978/issues/1) for why.
+
+Fields not applicable to a given frame's `payload_type` are present with value `None`, never omitted. Real
+example output (a long-frame ADS-B message: HDR + State Vector + Mode Status + AUX SV):
+
+```python
+{
+    'direction': 'downlink',
+    'payload_type': PayloadType.LONG,
+    'address_qualifier': AddressQualifier.ADSB_ICAO,
+    'icao': 'A042FF',
+    'latitude': 28.078308,
+    'longitude': -81.592412,
+    'altitude': 34875,
+    'altitude_type': 'baro',
+    'nic': 9,
+    'airground_state': 'airborne',
+    'groundspeed': 486,
+    'track': 357,
+    'track_type': 'track',
+    'vertical_rate': 832,
+    'vertical_rate_source': 'baro',
+    'length': None,
+    'width': None,
+    'position_offset': None,
+    'utc_coupled': True,
+    'tisb_site_id': None,
+    'emitter_category': EmitterCategory.MEDIUM,
+    'callsign': 'N116FE',
+    'squawk': None,
+    'emergency': Emergency.NO_EMERGENCY,
+    'uat_version': 2,
+    'sil': 3,
+    'transmit_mso': 35,
+    'nac_p': 10,
+    'nac_v': 2,
+    'nic_baro': True,
+    'has_cdti': True,
+    'has_acas': True,
+    'acas_ra_active': True,
+    'ident_active': False,
+    'atc_services': False,
+    'heading_type': 'true',
+    'altitude_secondary': 37050,
+    'altitude_secondary_type': 'geo',
+}
+```
+
+`payload_type`, `address_qualifier`, `emitter_category`, and `emergency` are `IntEnum`s (still compare/hash
+equal to their plain-int value) with a fallback to the plain int for any raw value that isn't a named member.
 
 ## License
 
