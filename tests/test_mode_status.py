@@ -24,7 +24,7 @@ def test_callsign_decode():
     assert result["callsign"] == "N12345"
     assert result["squawk"] is None
     assert result["category"] is EmitterCategory.LIGHT
-    assert result["emergency"] is Emergency.MEDICAL
+    assert result["emergency_state"] is Emergency.MEDICAL
     assert result["version"] == 2
     assert result["sil"] == 3
     assert result["transmit_mso"] == 42
@@ -68,7 +68,7 @@ def test_blank_field_yields_neither_callsign_nor_squawk():
     assert result["callsign"] is None
     assert result["squawk"] is None
     assert result["category"] is EmitterCategory.HEAVY
-    assert result["emergency"] is Emergency.RESERVED_7
+    assert result["emergency_state"] is Emergency.RESERVED_7
 
 
 def test_reserved_emergency_code_still_decodes():
@@ -78,4 +78,4 @@ def test_reserved_emergency_code_still_decodes():
     # int-fallback path.
     payload = _pack(34, [(184, 3, 7)])
     result = decode(payload)
-    assert result["emergency"] is Emergency.RESERVED_7
+    assert result["emergency_state"] is Emergency.RESERVED_7

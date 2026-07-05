@@ -36,7 +36,7 @@ long-frame ADS-B message: HDR + State Vector + Mode Status + AUX SV):
     'atc_services': False,
     'callsign': 'N116FE',
     'category': EmitterCategory.MEDIUM,
-    'emergency': Emergency.NO_EMERGENCY,
+    'emergency_state': Emergency.NO_EMERGENCY,
     'es_in': True,
     'groundspeed': 486,
     'gva': 2,
@@ -84,9 +84,9 @@ long-frame ADS-B message: HDR + State Vector + Mode Status + AUX SV):
 `position_containment_radius_m`/`position_vpl_m` are `None` here because `nic=9` is only resolvable when
 `nic_supplement_a=True` — a real, expected gap in the underlying table, not a bug (see `_uncertainty.py`).
 
-`payload_type`, `address_qualifier`, `category`, `emergency`, `sil_supplement`, `airground_state`,
+`payload_type`, `address_qualifier`, `category`, `emergency_state`, `sil_supplement`, `airground_state`,
 `altitude_type`, `altitude_secondary_type`, `vr_source`, and `heading_type` are all `IntEnum`s (still
-compare/hash equal to their plain-int value). `payload_type`/`address_qualifier`/`category`/`emergency`/
+compare/hash equal to their plain-int value). `payload_type`/`address_qualifier`/`category`/`emergency_state`/
 `sil_supplement` fall back to the plain int for any raw value with no named member; the other five have every
 raw value named, so no fallback applies. `airground_state` does not collapse subsonic/supersonic airborne into
 one value -- `AirgroundState.AIRBORNE_SUBSONIC` and `AirgroundState.AIRBORNE_SUPERSONIC` are distinct members,
@@ -152,7 +152,7 @@ fields here.
 | ❌ | `downlink_request` | Whether the transponder has more data queued to send. | N/A — not decoded by pyModeS978. 1090 only, DF4/5/20/21. |
 | ❌ | `downward_sense` | Whether the RA commands a downward sense. | N/A — not decoded by pyModeS978. 1090 only, BDS 3,0. |
 | ❌ | `dte_status` | Data Terminal Equipment status field. | N/A — not decoded by pyModeS978. 1090 only, BDS 1,0. |
-| `emergency` | `emergency_state` (bare `int`) | `Emergency` enum — emergency/priority status. Values: `NO_EMERGENCY`, `GENERAL`, `MEDICAL`, `MINIMUM_FUEL`, `NO_COMMUNICATIONS`, `UNLAWFUL_INTERFERENCE`, `DOWNED_AIRCRAFT`, `RESERVED_7`. Name doesn't match pyModeS's `emergency_state` — an oversight from #29's field-parity pass, not a deliberate choice; tracked in [#46](https://github.com/BrentIO/pyModeS978/issues/46). | Payload types 1, 3. |
+| `emergency_state` | `emergency_state` (bare `int`; ours is `Emergency`) | `Emergency` enum — emergency/priority status. Values: `NO_EMERGENCY`, `GENERAL`, `MEDICAL`, `MINIMUM_FUEL`, `NO_COMMUNICATIONS`, `UNLAWFUL_INTERFERENCE`, `DOWNED_AIRCRAFT`, `RESERVED_7`. | Payload types 1, 3. |
 | ❌ | `error` | Error message text, part of pyModeS's corrupt-input error envelope for batch/pipe decode modes. | N/A — not decoded by pyModeS978. 1090 only. |
 | `es_in` | ❌ (`capability_class` bitfield, see above) | Capability code — has a 1090ES receiver. | Payload types 1, 3. |
 | ❌ | `figure_of_merit` | Confidence/quality indicator for the met report. | N/A — not decoded by pyModeS978. 1090 only, BDS 4,4. |
