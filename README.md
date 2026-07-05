@@ -77,6 +77,7 @@ long-frame ADS-B message: HDR + State Vector + Mode Status + AUX SV):
     'velocity_accuracy_vfom_ms': 4.5,
     'version': 2,
     'vertical_rate': 832,
+    'vertical_status': 'airborne',
     'vr_source': AltitudeSource.BARO,
     'width': None,
 }
@@ -258,7 +259,7 @@ fields here.
 | `velocity_accuracy_vfom_ms` | ❌ (see above) | Vertical Figure of Merit for velocity, m/s, from `nac_v`. | Payload types 1, 3. |
 | `version` | `version` | ADS-B/MOPS version the transmitting equipment implements, 3-bit raw. | Payload types 1, 3. |
 | `vertical_rate` | `vertical_rate` | Feet/min, signed, from the 11-bit raw vertical rate code. | Payload types 0–10; airborne only — `None` on the ground (those bits hold aircraft dimensions instead). |
-| ❌ | `vertical_status` | Airborne/on-ground bit, as text. | N/A — not decoded by pyModeS978. 1090 only, DF0/16. |
+| `vertical_status` | `vertical_status` | `"airborne"` or `"on-ground"`, matching pyModeS's exact strings -- derived from `airground_state` (both `AIRBORNE_SUBSONIC`/`AIRBORNE_SUPERSONIC` map to `"airborne"`). Derived convenience field, not a new bit read. | Payload types 0–10; `None` for `RESERVED` airground state (no pyModeS equivalent for that state). |
 | ❌ | `vnav_mode` | Whether VNAV mode is engaged. | N/A — not decoded by pyModeS978. 1090 only, BDS 4,0. |
 | `vr_source` | `vr_source` (bare `str`; ours is `AltitudeSource`) | `BARO` or `GNSS` — which kind of altitude `vertical_rate` is derived from. Same values as pyModeS's own `"BARO"`/`"GNSS"` strings, matched exactly. | Payload types 0–10; airborne only. |
 | ❌ | `wake_vortex` | Human-readable wake turbulence category text, derived from `category` + typecode. | N/A — not decoded by pyModeS978. 1090 only, BDS 0,8. |

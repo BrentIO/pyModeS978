@@ -53,6 +53,7 @@ def test_airborne_velocity_and_vertical_rate():
     )
     result = pyModeS978.decode(frame.hex())
     assert result["airground_state"] == AirgroundState.AIRBORNE_SUBSONIC
+    assert result["vertical_status"] == "airborne"
     assert result["groundspeed"] == round(math.sqrt(100**2 + 50**2))
     assert result["track"] == round((360 + 90 - math.degrees(math.atan2(100, -50))) % 360, 1)
     assert result["heading"] is None
@@ -65,6 +66,7 @@ def test_airborne_velocity_and_vertical_rate():
 def test_supersonic_velocity_multiplier():
     frame = build_frame(payload_type=0, airground_state=1, ns_velocity=40, ew_velocity=40)
     result = pyModeS978.decode(frame.hex())
+    assert result["vertical_status"] == "airborne"
     assert result["groundspeed"] == round(math.sqrt(40**2 + 40**2))
     assert result["track"] == 45.0
 
@@ -79,6 +81,7 @@ def test_ground_velocity_and_track():
     )
     result = pyModeS978.decode(frame.hex())
     assert result["airground_state"] == AirgroundState.ON_GROUND
+    assert result["vertical_status"] == "on-ground"
     assert result["groundspeed"] == 50
     assert result["track"] == 271.4
     assert result["heading"] is None
@@ -119,6 +122,7 @@ def test_reserved_airground_state_has_no_velocity_or_dimensions():
     frame = build_frame(payload_type=0, airground_state=3)
     result = pyModeS978.decode(frame.hex())
     assert result["airground_state"] == AirgroundState.RESERVED
+    assert result["vertical_status"] is None
     assert result["groundspeed"] is None
     assert result["track"] is None
     assert result["vertical_rate"] is None

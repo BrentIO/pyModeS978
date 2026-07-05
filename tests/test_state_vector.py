@@ -31,6 +31,7 @@ def test_airborne_position_altitude_velocity():
     assert result["altitude_type"] == AltitudeSource.BARO
     assert result["nic"] == 8
     assert result["airground_state"] == AirgroundState.AIRBORNE_SUBSONIC
+    assert result["vertical_status"] == "airborne"
     assert result["groundspeed"] == round(math.sqrt(100**2 + 50**2))
     assert result["track"] == 333.4
     assert result["heading"] is None
@@ -60,6 +61,7 @@ def test_no_position_and_reserved_airground_state():
     assert result["altitude_type"] is None
     assert result["nic"] == 0
     assert result["airground_state"] == AirgroundState.RESERVED
+    assert result["vertical_status"] is None
     assert result["groundspeed"] is None
     assert result["track"] is None
     assert result["heading"] is None
@@ -80,6 +82,7 @@ def test_position_valid_at_origin_when_nic_nonzero():
 def test_ground_speed_track_and_dimensions():
     result = decode(bytes.fromhex(_GROUND_HEX), address_qualifier=0)
     assert result["airground_state"] == AirgroundState.ON_GROUND
+    assert result["vertical_status"] == "on-ground"
     assert result["groundspeed"] == 50
     assert result["track"] == 271.4
     assert result["heading"] is None
@@ -106,6 +109,7 @@ def test_supersonic_velocity_multiplier():
     )
     result = decode(payload, address_qualifier=0)
     assert result["airground_state"] == AirgroundState.AIRBORNE_SUPERSONIC
+    assert result["vertical_status"] == "airborne"
     # magnitude 11 -> 10 kt, x4 for supersonic -> 40 kt on each axis
     assert result["groundspeed"] == round(math.sqrt(40**2 + 40**2))
     assert result["track"] == 45.0  # equal N/S and E/W -> 45 degrees
