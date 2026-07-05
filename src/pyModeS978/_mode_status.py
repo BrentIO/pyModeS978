@@ -1,5 +1,5 @@
 from ._bits import read_uint
-from ._enums import Emergency, EmitterCategory, coerce
+from ._enums import Emergency, EmitterCategory, SILSupplement, coerce
 
 _BASE40_ALPHABET = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ  .."
 
@@ -8,18 +8,23 @@ FIELDS = (
     "callsign",
     "squawk",
     "emergency",
-    "uat_version",
+    "mops_version",
     "sil",
     "transmit_mso",
+    "sda",
     "nac_p",
     "nac_v",
     "nic_baro",
-    "has_cdti",
-    "has_acas",
-    "acas_ra_active",
+    "uat_in",
+    "es_in",
+    "tcas_operational",
+    "tcas_ra_active",
     "ident_active",
     "atc_services",
-    "heading_type",
+    "sil_supplement",
+    "gva",
+    "single_antenna",
+    "nic_supplement",
 )
 
 
@@ -48,34 +53,49 @@ def decode(payload: bytes) -> dict:
             squawk = text
 
     emergency = coerce(Emergency, read_uint(payload, 184, 3))
-    uat_version = read_uint(payload, 187, 3)
+    mops_version = read_uint(payload, 187, 3)
     sil = read_uint(payload, 190, 2)
     transmit_mso = read_uint(payload, 192, 6)
+    sda = read_uint(payload, 198, 2)
     nac_p = read_uint(payload, 200, 4)
     nac_v = read_uint(payload, 204, 3)
     nic_baro = bool(read_uint(payload, 207, 1))
-    has_cdti = bool(read_uint(payload, 208, 1))
-    has_acas = bool(read_uint(payload, 209, 1))
-    acas_ra_active = bool(read_uint(payload, 210, 1))
-    ident_active = bool(read_uint(payload, 211, 1))
-    atc_services = bool(read_uint(payload, 212, 1))
-    heading_type = "magnetic" if read_uint(payload, 213, 1) else "true"
+
+    # §2.2.4.5.4.12 "CAPABILITY CODES"
+    uat_in = bool(read_uint(payload, 208, 1))
+    es_in = bool(read_uint(payload, 209, 1))
+    tcas_operational = bool(read_uint(payload, 210, 1))
+
+    # §2.2.4.5.4.13 "OPERATIONAL MODES"
+    tcas_ra_active = bool(read_uint(payload, 211, 1))
+    ident_active = bool(read_uint(payload, 212, 1))
+    atc_services = bool(read_uint(payload, 213, 1))
+
+    sil_supplement = coerce(SILSupplement, read_uint(payload, 215, 1))
+    gva = read_uint(payload, 216, 2)
+    single_antenna = bool(read_uint(payload, 218, 1))
+    nic_supplement = bool(read_uint(payload, 219, 1))
 
     return {
         "emitter_category": emitter_category,
         "callsign": callsign,
         "squawk": squawk,
         "emergency": emergency,
-        "uat_version": uat_version,
+        "mops_version": mops_version,
         "sil": sil,
         "transmit_mso": transmit_mso,
+        "sda": sda,
         "nac_p": nac_p,
         "nac_v": nac_v,
         "nic_baro": nic_baro,
-        "has_cdti": has_cdti,
-        "has_acas": has_acas,
-        "acas_ra_active": acas_ra_active,
+        "uat_in": uat_in,
+        "es_in": es_in,
+        "tcas_operational": tcas_operational,
+        "tcas_ra_active": tcas_ra_active,
         "ident_active": ident_active,
         "atc_services": atc_services,
-        "heading_type": heading_type,
+        "sil_supplement": sil_supplement,
+        "gva": gva,
+        "single_antenna": single_antenna,
+        "nic_supplement": nic_supplement,
     }

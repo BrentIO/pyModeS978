@@ -33,7 +33,9 @@ def test_real_capture_mode_status_decodes_without_crashing(record):
         assert 1 <= len(result["callsign"]) <= 8
     if result["squawk"] is not None:
         assert 1 <= len(result["squawk"]) <= 8
-    assert 0 <= result["uat_version"] <= 7
+    assert 0 <= result["mops_version"] <= 7
     assert 0 <= result["sil"] <= 3
+    assert 0 <= result["sda"] <= 3
     assert 0 <= result["nac_p"] <= 15
     assert 0 <= result["nac_v"] <= 7
+    assert 0 <= result["gva"] <= 3
