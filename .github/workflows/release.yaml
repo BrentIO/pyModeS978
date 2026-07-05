@@ -40,6 +40,6 @@ jobs:
           generate_release_notes: true
 
       - name: Trigger PyPI publish
-        run: gh workflow run publish.yaml --ref ${{ inputs.version }}
+        run: gh workflow run publish-pypi.yaml --ref ${{ inputs.version }}
         env:
           GH_TOKEN: ${{ github.token }}
