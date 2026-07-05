@@ -38,6 +38,7 @@ long-frame ADS-B message: HDR + State Vector + Mode Status + AUX SV):
     'category': EmitterCategory.MEDIUM,
     'emergency_state': Emergency.NO_EMERGENCY,
     'es_in': True,
+    'geo_minus_baro': 2175,
     'groundspeed': 486,
     'gva': 2,
     'heading': None,
@@ -126,7 +127,7 @@ fields here.
 | `altitude` | `altitude` | Feet, from the 12-bit raw altitude code: `(raw - 1) * 25 - 1000`. | Payload types 0–10; `None` if the raw altitude code is `0` (unavailable). |
 | ❌ | `altitude_crossing` | Whether the RA commands an altitude crossing maneuver. | N/A — not decoded by pyModeS978. 1090 only, BDS 3,0. |
 | ❌ | `altitude_hold_mode` | Whether altitude hold mode is engaged. | N/A — not decoded by pyModeS978. 1090 only, BDS 4,0. |
-| `altitude_secondary` | ❌ (pyModeS's `geo_minus_baro` is a *delta* between the two altitudes, not a second absolute value) | Feet. Whichever altitude type `altitude` *isn't* — if `altitude_type` is `BARO`, this is the GNSS altitude, and vice versa. | Payload types 1, 2, 5, 6 (AUX SV); `None` if the raw AUX SV altitude code is `0`. |
+| `altitude_secondary` | ❌ (pyModeS's `geo_minus_baro` is a *delta* between the two altitudes, not a second absolute value -- see `geo_minus_baro` below for the delta itself) | Feet. Whichever altitude type `altitude` *isn't* — if `altitude_type` is `BARO`, this is the GNSS altitude, and vice versa. | Payload types 1, 2, 5, 6 (AUX SV); `None` if the raw AUX SV altitude code is `0`. |
 | `altitude_secondary_type` | ❌ | `AltitudeSource` enum (`BARO`/`GNSS`) — always the opposite of `altitude_type`. | Same as `altitude_secondary`. |
 | `altitude_type` | ❌ (pyModeS infers baro-vs-GNSS from the raw ADS-B typecode instead of exposing a field) | `AltitudeSource` enum (`BARO`/`GNSS`) — which kind of altitude `altitude` is. | Payload types 0–10; `None` alongside `altitude` when unavailable. |
 | ❌ | `approach_mode` | Whether approach mode is engaged. | N/A — not decoded by pyModeS978. 1090 only, BDS 4,0. |
@@ -160,7 +161,7 @@ fields here.
 | ❌ | `figure_of_merit` | Confidence/quality indicator for the met report. | N/A — not decoded by pyModeS978. 1090 only, BDS 4,4. |
 | ❌ | `flight_status` | Raw 3-bit flight status code — alert/SPI/on-ground bits. | N/A — not decoded by pyModeS978. 1090 only, DF4/5/20/21. |
 | ❌ | `flight_status_text` | Human-readable decode of `flight_status`. | N/A — not decoded by pyModeS978. 1090 only, DF4/5/20/21. |
-| ❌ | `geo_minus_baro` | Signed delta between geometric and barometric altitude, feet. | N/A — not decoded by pyModeS978. 1090 only, BDS 0,9; see `altitude_secondary`'s note on this field above. |
+| `geo_minus_baro` | `geo_minus_baro` | Signed delta between geometric and barometric altitude, feet -- `geometric - barometric`, derived directly from `altitude`/`altitude_secondary` and their `_type` tags. Derived convenience field, not a new bit read; matches pyModeS's field name. | Payload types 1, 2, 5, 6 (AUX SV); `None` if either altitude is unavailable in this frame. |
 | `groundspeed` | `groundspeed` | Knots, rounded. Airborne: `√(ns² + ew²)` from the N/S and E/W velocity components. Ground: a direct raw code. | Payload types 0–10; `None` for `RESERVED` airground state. |
 | `gva` | ❌ | Geometric Vertical Accuracy, 2-bit raw (0–3) — 95% accuracy bound on GNSS altitude. | Payload types 1, 3. |
 | `heading` | `heading` | Ground-only heading, 1 decimal, from the 11-bit raw track/heading code (`* 360/512`). | Payload types 0–10; populated instead of `track` only when the ground type code says magnetic or true heading — see `heading_type`. |

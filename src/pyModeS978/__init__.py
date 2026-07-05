@@ -1,4 +1,5 @@
 from . import _aux_sv, _frame, _mode_status, _state_vector, _uncertainty
+from ._enums import AltitudeSource
 from ._version import __version__ as __version__
 
 _SV_TYPES = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10}
@@ -43,5 +44,17 @@ def decode(raw: str) -> dict | None:
         result.update(_aux_sv.decode(frame.payload))
     else:
         result.update(dict.fromkeys(_aux_sv.FIELDS))
+
+    if (
+        result["altitude"] is not None
+        and result["altitude_secondary"] is not None
+        and result["altitude_type"] is not None
+    ):
+        if result["altitude_type"] == AltitudeSource.BARO:
+            result["geo_minus_baro"] = result["altitude_secondary"] - result["altitude"]
+        else:
+            result["geo_minus_baro"] = result["altitude"] - result["altitude_secondary"]
+    else:
+        result["geo_minus_baro"] = None
 
     return dict(sorted(result.items()))
