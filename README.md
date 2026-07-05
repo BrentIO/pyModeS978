@@ -121,7 +121,7 @@ if pyModeS978 had a field of that same name, so the whole table reads as one mer
 than "pyModeS978's first, then pyModeS's." Where a field's type is one of pyModeS978's `IntEnum`s, its possible
 values are listed. **Payload Types** is
 which `payload_type` values a field's block is structurally present for (`—` for pyModeS-only fields, since
-they don't exist in `decode()`'s output at all); **Requirements** covers everything else — finer per-frame
+they don't exist in `decode()`'s output at all); **Notes** covers everything else — finer per-frame
 conditions like ground/airborne-only, or when a field resolves to `None` even within an applicable payload
 type.
 
@@ -136,7 +136,7 @@ Two recurring patterns, noted once here instead of in every row:
   fields here call the UAT equivalents automatically as part of `decode()`, since a single-call decode was
   the natural fit for how UAT frames are structured.
 
-| pyModeS978 Field | pyModeS Equivalent | Description | Payload Types | Requirements |
+| pyModeS978 Field | pyModeS Equivalent | Description | Payload Types | Notes |
 |---|---|---|---|---|
 | ❌ | `acas_hybrid_surveillance` | ACAS hybrid surveillance capability flag. | — | 1090 only, BDS 1,0. |
 | ❌ | `acas_operational` | Whether ACAS is operational (the data link capability report's own copy of this flag). | — | 1090 only, BDS 1,0. |
@@ -144,7 +144,7 @@ Two recurring patterns, noted once here instead of in every row:
 | ❌ | `acas_rtca_version` | Which RTCA ACAS version the equipment implements. | — | 1090 only, BDS 1,0. |
 | `address_qualifier` | ❌ | `AddressQualifier` enum — what kind of address `icao` is and where the frame came from. Values: `ADSB_ICAO`, `NATIONAL_RESERVED`, `TISB_ICAO`, `TISB_OTHER`, `VEHICLE`, `FIXED_BEACON`, `RESERVED_6`, `RESERVED_7`. | All | — |
 | ❌ | `aircraft_identification_capability` | Whether the transponder can report aircraft identification (BDS 0,8). | — | 1090 only, BDS 1,0. |
-| `airground_state` | ❌ | `AirgroundState` enum — `AIRBORNE_SUBSONIC`, `AIRBORNE_SUPERSONIC`, `ON_GROUND`, or `RESERVED`. Subsonic/supersonic kept distinct, not collapsed into one `AIRBORNE` value. | 0–10 | — |
+| `airground_state` | ❌ | `AirgroundState` enum — `AIRBORNE_SUBSONIC`, `AIRBORNE_SUPERSONIC`, `ON_GROUND`, or `RESERVED`. | 0–10 | — |
 | ❌ | `airspeed` | Air-referenced (not ground) speed, knots — an alternative to `groundspeed` for some subtypes. | — | 1090 only, BDS 0,9. |
 | ❌ | `airspeed_type` | Whether `airspeed` is true or indicated airspeed. | — | 1090 only, BDS 0,9. |
 | `altitude` | `altitude` | Feet, from the 12-bit raw altitude code: `(raw - 1) * 25 - 1000`. | 0–10 | `None` if the raw altitude code is `0` (unavailable). |
