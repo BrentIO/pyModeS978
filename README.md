@@ -47,6 +47,7 @@ long-frame ADS-B message: HDR + State Vector + Mode Status + AUX SV):
     'latitude': 28.078308,
     'length': None,
     'longitude': -81.592412,
+    'magnetic_heading': None,
     'nac_p': 10,
     'nac_v': 2,
     'nic': 9,
@@ -178,7 +179,7 @@ fields here.
 | ❌ | `lnav_mode` | Whether LNAV mode is engaged. | N/A — not decoded by pyModeS978. 1090 only, BDS 6,2. |
 | `longitude` | `longitude` | See `latitude`. | Same as `latitude`. |
 | ❌ | `mach` | Mach number. | N/A — not decoded by pyModeS978. 1090 only, BDS 6,0. |
-| ❌ | `magnetic_heading` | Magnetic heading, degrees. | N/A — not decoded by pyModeS978. 1090 only, BDS 6,0 heading and speed report. |
+| `magnetic_heading` | `magnetic_heading` | Degrees, 1 decimal — same value as `heading` when `heading_type` is `MAGNETIC`, else `None`. Derived convenience field, not a new bit read; matches pyModeS's field name. | Payload types 0–10; ground only. |
 | ❌ | `microburst` | Microburst intensity code. | N/A — not decoded by pyModeS978. 1090 only, BDS 4,5. |
 | ❌ | `mode_s_specific_services` | Whether Mode S specific services capability is reported. | N/A — not decoded by pyModeS978. 1090 only, BDS 1,0. |
 | ❌ | `mode_s_subnetwork_version` | Which Mode S subnetwork version the transponder implements. | N/A — not decoded by pyModeS978. 1090 only, BDS 1,0. |

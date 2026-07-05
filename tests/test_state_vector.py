@@ -35,6 +35,7 @@ def test_airborne_position_altitude_velocity():
     assert result["track"] == 333.4
     assert result["heading"] is None
     assert result["heading_type"] is None
+    assert result["magnetic_heading"] is None
     assert result["vertical_rate"] == 640
     assert result["vr_source"] == AltitudeSource.BARO
     assert result["utc_coupled"] is True
@@ -63,6 +64,7 @@ def test_no_position_and_reserved_airground_state():
     assert result["track"] is None
     assert result["heading"] is None
     assert result["heading_type"] is None
+    assert result["magnetic_heading"] is None
     assert result["vertical_rate"] is None
     assert result["vr_source"] is None
 
@@ -82,6 +84,7 @@ def test_ground_speed_track_and_dimensions():
     assert result["track"] == 271.4
     assert result["heading"] is None
     assert result["heading_type"] is None
+    assert result["magnetic_heading"] is None
     assert result["length"] == 85
     assert result["width"] == 45
     assert result["position_offset"] is True
@@ -122,6 +125,7 @@ def test_ground_invalid_type_code():
     assert result["track"] is None
     assert result["heading"] is None
     assert result["heading_type"] is None
+    assert result["magnetic_heading"] is None
 
 
 def test_ground_magnetic_heading():
@@ -132,6 +136,7 @@ def test_ground_magnetic_heading():
     assert result["track"] is None
     assert result["heading"] == 271.4
     assert result["heading_type"] == HeadingType.MAGNETIC
+    assert result["magnetic_heading"] == 271.4
 
 
 def test_ground_true_heading():
@@ -142,3 +147,4 @@ def test_ground_true_heading():
     assert result["track"] is None
     assert result["heading"] == 271.4
     assert result["heading_type"] == HeadingType.TRUE
+    assert result["magnetic_heading"] is None

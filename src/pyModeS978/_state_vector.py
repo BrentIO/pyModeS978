@@ -21,6 +21,7 @@ FIELDS = (
     "track",
     "heading",
     "heading_type",
+    "magnetic_heading",
     "vertical_rate",
     "vr_source",
     "length",
@@ -83,6 +84,9 @@ def decode(payload: bytes, address_qualifier: AddressQualifier | int) -> dict:
         "track": track if track is None else round(track, 1),
         "heading": heading if heading is None else round(heading, 1),
         "heading_type": heading_type,
+        "magnetic_heading": (
+            round(heading, 1) if heading_type == HeadingType.MAGNETIC else None
+        ),
         "vertical_rate": vertical_rate,
         "vr_source": vr_source,
         "length": length,
