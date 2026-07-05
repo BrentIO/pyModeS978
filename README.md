@@ -3,18 +3,7 @@
 A pure-Python decoder for UAT (978 MHz) frames — the sibling protocol to 1090 MHz ADS-B. `pyModeS` has no UAT
 support and no Python UAT decoder exists elsewhere, so this library implements the frame layout from scratch.
 
-## Status
-
-Core decoding (HDR, State Vector, Mode Status, AUX SV, plus derived accuracy/integrity values) is implemented
-and tested — synthetic frames covering every payload-type/edge case, real-capture regression tests, and field
-names audited against pyModeS's 1090 output for consistency. A field-by-field data dictionary for README.md is
-still open ([#30](https://github.com/BrentIO/pyModeS978/issues/30), documentation only, doesn't block anything
-below). Not yet published to PyPI ([#9](https://github.com/BrentIO/pyModeS978/issues/9)). See the
-[issue tracker](https://github.com/BrentIO/pyModeS978/issues) for anything not listed here.
-
 ## Install
-
-Not yet published to PyPI — see [#9](https://github.com/BrentIO/pyModeS978/issues/9). Once it is:
 
 ```bash
 pip install pyModeS978
