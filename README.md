@@ -117,7 +117,7 @@ Malformed input to `decode()` raises one of three `DecodeError` subclasses, rath
 - `DirectionMismatchError`: the `-`/`+` prefix disagrees with the direction implied by the input's byte length.
 
 Every error type carries the original input passed to `decode()` as `.raw`, unmodified. This is useful for
-correlating a failure back to its source record.
+correlating a failure back to its input.
 
 ## Data dictionary
 
