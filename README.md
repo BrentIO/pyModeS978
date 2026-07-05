@@ -4,7 +4,7 @@ A pure-Python decoder for UAT (978 MHz) frames — the sibling protocol to 1090 
 support and no Python UAT decoder exists elsewhere, so this library implements the frame layout from scratch.
 
 Wherever possible, the fields with like-for-like meaning have been mapped and should be drop-in replacements
-in many instances.
+in the most common instances.
 
 ## Install
 
