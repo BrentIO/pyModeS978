@@ -1,6 +1,8 @@
+from synth import build_frame
 from synth import pack as _pack
 
 import pyModeS978
+from pyModeS978._enums import AltitudeSource
 
 
 def _frame_with_payload_type(payload_type: int) -> bytes:
@@ -82,3 +84,39 @@ def test_hdr_only_type():
 
 def test_uplink_returns_none():
     assert pyModeS978.decode("+" + "00" * 432) is None
+
+
+def test_geo_minus_baro_baro_primary():
+    frame = build_frame(
+        payload_type=1, altitude=1000, altitude_type=AltitudeSource.BARO, altitude_secondary=1200
+    )
+    result = pyModeS978.decode(frame.hex())
+    assert result["altitude"] == 1000
+    assert result["altitude_secondary"] == 1200
+    assert result["geo_minus_baro"] == 200
+
+
+def test_geo_minus_baro_gnss_primary():
+    frame = build_frame(
+        payload_type=1, altitude=1200, altitude_type=AltitudeSource.GNSS, altitude_secondary=1000
+    )
+    result = pyModeS978.decode(frame.hex())
+    assert result["altitude"] == 1200
+    assert result["altitude_secondary"] == 1000
+    assert result["geo_minus_baro"] == 200
+
+
+def test_geo_minus_baro_none_without_auxsv():
+    # payload_type=0 -- no AUX SV block, so altitude_secondary is always None.
+    frame = build_frame(payload_type=0, altitude=1000, altitude_type=AltitudeSource.BARO)
+    result = pyModeS978.decode(frame.hex())
+    assert result["altitude_secondary"] is None
+    assert result["geo_minus_baro"] is None
+
+
+def test_geo_minus_baro_none_when_primary_altitude_unavailable():
+    frame = build_frame(payload_type=1, altitude=None, altitude_secondary=1200)
+    result = pyModeS978.decode(frame.hex())
+    assert result["altitude"] is None
+    assert result["altitude_secondary"] == 1200
+    assert result["geo_minus_baro"] is None

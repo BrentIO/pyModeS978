@@ -10,7 +10,7 @@ _FIXTURE = Path(__file__).parent / "fixtures" / "uat-example.ndjson"
 _RECORDS = [json.loads(line) for line in _FIXTURE.read_text().splitlines() if line.strip()]
 
 _EXPECTED_KEYS = (
-    {"payload_type", "address_qualifier", "icao"}
+    {"payload_type", "address_qualifier", "icao", "geo_minus_baro"}
     | set(_state_vector.FIELDS)
     | set(_mode_status.FIELDS)
     | set(_aux_sv.FIELDS)
