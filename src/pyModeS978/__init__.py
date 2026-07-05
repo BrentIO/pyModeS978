@@ -12,7 +12,6 @@ def decode(raw: str) -> dict | None:
         return None
 
     result = {
-        "direction": frame.direction,
         "payload_type": frame.payload_type,
         "address_qualifier": frame.address_qualifier,
         "icao": frame.icao,

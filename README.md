@@ -36,7 +36,6 @@ long-frame ADS-B message: HDR + State Vector + Mode Status + AUX SV):
     'atc_services': False,
     'callsign': 'N116FE',
     'category': EmitterCategory.MEDIUM,
-    'direction': 'downlink',
     'emergency': Emergency.NO_EMERGENCY,
     'es_in': True,
     'groundspeed': 486,
@@ -149,7 +148,6 @@ fields here.
 | ❌ | `crc_valid` | Whether the message's CRC checksum passed. | N/A — not decoded by pyModeS978. 1090 only, DF17/18/20/21. |
 | ❌ | `cross_link_capability` | Whether the transponder can support DF16 replies. | N/A — not decoded by pyModeS978. 1090 only, DF0. |
 | ❌ | `df` | Downlink Format — the 5-bit code identifying which of ~10 different Mode S/ADS-B message formats a 1090 reply is. | N/A — not decoded by pyModeS978. 1090 only, always present; no UAT equivalent structurally, though `payload_type` plays an analogous dispatch role. |
-| `direction` | ❌ | `"downlink"` or `"uplink"`. | All payload types; always `"downlink"` in practice since uplink frames return `None` from `decode()` before this field is ever set. |
 | ❌ | `downlink_elm_throughput` | Downlink Extended Length Message throughput capability. | N/A — not decoded by pyModeS978. 1090 only, BDS 1,0. |
 | ❌ | `downlink_request` | Whether the transponder has more data queued to send. | N/A — not decoded by pyModeS978. 1090 only, DF4/5/20/21. |
 | ❌ | `downward_sense` | Whether the RA commands a downward sense. | N/A — not decoded by pyModeS978. 1090 only, BDS 3,0. |
