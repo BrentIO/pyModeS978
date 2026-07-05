@@ -18,8 +18,9 @@ result = pyModeS978.decode(raw)   # dict | None
 ```
 
 `raw` is accepted with or without the dump978-fa direction prefix (`-` = downlink, `+` = uplink); trailing
-`;metadata` is stripped if present. Uplink frames (FIS-B weather/NOTAM broadcasts, not traffic data) always
-decode to `None` — see [#1](https://github.com/BrentIO/pyModeS978/issues/1) for why.
+`;metadata` is stripped if present. Uplink frames (FIS-B weather/NOTAM ground broadcasts) always decode to
+`None` — they carry no traffic data, and 1090 traffic rebroadcast to UAT receivers (TIS-B/ADS-R) already
+arrives as a downlink frame, distinguished via `address_qualifier`.
 
 Fields not applicable to a given frame's `payload_type` are present with value `None`, never omitted. Keys are
 sorted alphabetically, so a specific field is easy to find in printed output. Real example output (a
@@ -105,13 +106,14 @@ pyModeS has nothing comparable. pyModeS-only fields are inserted alphabetically 
 that same name, so the whole table reads as one merged, alphabetical list rather than "ours first, then
 theirs." Where a field's type is one of our `IntEnum`s, its possible values are listed.
 
-Two recurring pyModeS-only patterns, noted once here instead of in every row: pyModeS exposes its Mode
-Status-equivalent capability/operational-mode bits as two raw bitfield ints (`capability_class`,
-`operational_mode`) rather than breaking them out into named booleans the way
-`uat_in`/`es_in`/`tcas_operational`/`tcas_ra_active`/`ident_active`/`atc_services` do; and pyModeS keeps its own
-uncertainty lookup tables (`_uncertainty.py`) to itself rather than auto-populating `decode()` output with
-them, unlike the `position_accuracy_*`/`velocity_accuracy_*`/`position_containment_*`/`sil_probability_*`
-fields here.
+Two recurring patterns, noted once here instead of in every row: pyModeS's Mode Status-equivalent
+capability/operational-mode bits are exposed as two raw bitfield ints (`capability_class`,
+`operational_mode`), while `uat_in`/`es_in`/`tcas_operational`/`tcas_ra_active`/`ident_active`/`atc_services`
+break the UAT equivalent out into individual named booleans, since UAT's smaller capability/operational-mode
+set made that practical. And pyModeS's own `_uncertainty.py` has equivalent NIC/NACp/NACv/SIL lookup tables,
+but leaves calling them up to the caller; the `position_accuracy_*`/`velocity_accuracy_*`/
+`position_containment_*`/`sil_probability_*` fields here call the UAT equivalents automatically as part of
+`decode()`, since a single-call decode was the natural fit for how UAT frames are structured.
 
 | pyModeS978 Field | pyModeS Equivalent | Description | Requirements |
 |---|---|---|---|
@@ -139,9 +141,9 @@ fields here.
 | ❌ | `bds_candidates` | When BDS is ambiguous from typecode alone, the list of registers it might be. | N/A — not decoded by pyModeS978. 1090 only, DF17/18. |
 | `callsign` | `callsign` | Flight ID, base-40-decoded from Mode Status's packed character field and whitespace-stripped. | Payload types 1, 3; `None` if this frame's field holds a squawk instead (see `squawk`), or is blank. |
 | ❌ | `capability` | 3-bit capability field — transponder's Mode S capability level. | N/A — not decoded by pyModeS978. 1090 only, DF11. |
-| ❌ | `capability_class` | Raw capability class bitfield (packs the `uat_in`/`es_in`/`tcas_operational`-equivalent bits together instead of naming them individually). | N/A — not decoded by pyModeS978. 1090 only, BDS 6,5 operational status report. |
+| ❌ | `capability_class` | Raw capability class bitfield -- the packed equivalent of `uat_in`/`es_in`/`tcas_operational`, exposed here as individually named booleans instead. | N/A — not decoded by pyModeS978. 1090 only, BDS 6,5 operational status report. |
 | ❌ | `capability_text` | Human-readable decode of `capability`. | N/A — not decoded by pyModeS978. 1090 only, DF11. |
-| `category` | `category` (bare `int`; ours is `EmitterCategory`) | Aircraft/vehicle emitter category. Values: `NO_INFORMATION`, `LIGHT`, `MEDIUM`, `MEDIUM_LARGE`, `MEDIUM_LARGE_HIGH_VORTEX`, `HEAVY`, `HIGHLY_MANEUVERABLE`, `ROTORCRAFT`, `RESERVED_8`, `GLIDER_SAILPLANE`, `LIGHTER_THAN_AIR`, `PARACHUTIST_SKYDIVER`, `ULTRALIGHT_HANGGLIDER_PARAGLIDER`, `RESERVED_13`, `UAV`, `SPACE_TRANSATMOSPHERIC`, `RESERVED_16`, `EMERGENCY_VEHICLE`, `SERVICE_VEHICLE`, `POINT_OBSTACLE`, `CLUSTER_OBSTACLE`, `LINE_OBSTACLE`, `RESERVED_22`–`RESERVED_39`. pyModeS never named these values — a deviation from pyModeS predating any parity effort, not a #29 decision. | Payload types 1, 3. |
+| `category` | `category` (bare `int`; ours is `EmitterCategory`) | Aircraft/vehicle emitter category. Values: `NO_INFORMATION`, `LIGHT`, `MEDIUM`, `MEDIUM_LARGE`, `MEDIUM_LARGE_HIGH_VORTEX`, `HEAVY`, `HIGHLY_MANEUVERABLE`, `ROTORCRAFT`, `RESERVED_8`, `GLIDER_SAILPLANE`, `LIGHTER_THAN_AIR`, `PARACHUTIST_SKYDIVER`, `ULTRALIGHT_HANGGLIDER_PARAGLIDER`, `RESERVED_13`, `UAV`, `SPACE_TRANSATMOSPHERIC`, `RESERVED_16`, `EMERGENCY_VEHICLE`, `SERVICE_VEHICLE`, `POINT_OBSTACLE`, `CLUSTER_OBSTACLE`, `LINE_OBSTACLE`, `RESERVED_22`–`RESERVED_39`. pyModeS exposes this as a bare `int`; we chose to name the values here for readability. | Payload types 1, 3. |
 | ❌ | `common_usage_gicb_capability` | Whether the transponder reports common-usage GICB capability (BDS 1,7). | N/A — not decoded by pyModeS978. 1090 only, BDS 1,0. |
 | ❌ | `config` | Raw configuration byte. | N/A — not decoded by pyModeS978. 1090 only, BDS 1,0 data link capability. |
 | ❌ | `corrective` | Whether the active RA is corrective (requires a maneuver) vs. preventive. | N/A — not decoded by pyModeS978. 1090 only, BDS 3,0. |
@@ -190,16 +192,16 @@ fields here.
 | ❌ | `mv` | Raw ACAS message field, further decoded into BDS 3,0 fields if a TCAS RA is active. | N/A — not decoded by pyModeS978. 1090 only, DF16. |
 | `nac_p` | `nac_p` | Navigation Accuracy Category for Position, 4-bit raw (0–15; only 0–11 defined). Resolves `position_accuracy_epu_m`/`position_accuracy_vepu_m`. | Payload types 1, 3. |
 | `nac_v` | `nac_v` | Navigation Accuracy Category for Velocity, 3-bit raw (0–7; only 0–4 defined). Resolves `velocity_accuracy_hfom_ms`/`velocity_accuracy_vfom_ms`. | Payload types 1, 3. |
-| `nic` | ❌ (pyModeS resolves NIC internally from typecode + supplement bits for its own uncertainty functions, but never exposes the resolved number as a `decode()` output key) | Navigation Integrity Category, 4-bit raw (0–15) — confidence in the position fix. Combines with `nic_supplement_a` to resolve `position_containment_radius_m`/`position_vpl_m`. | Payload types 0–10. |
+| `nic` | ❌ (pyModeS resolves NIC internally from typecode + supplement bits for its own uncertainty functions; the resolved number itself isn't part of its `decode()` output) | Navigation Integrity Category, 4-bit raw (0–15) — confidence in the position fix. Combines with `nic_supplement_a` to resolve `position_containment_radius_m`/`position_vpl_m`. | Payload types 0–10. |
 | ❌ | `nic_b` | The single "NIC supplement B" bit carried in the raw airborne position message. | N/A — not decoded by pyModeS978. 1090 only, BDS 0,5. |
 | `nic_baro` | `nic_baro` (bare `int`; ours is `bool`) | Whether the barometric altitude has been cross-checked against another source. | Payload types 1, 3. |
-| `nic_supplement_a` | `nic_supplement_a` (bare `int`; ours is `bool`; name matches pyModeS exactly — see #29) | The one NIC supplement bit UAT has (1090 has two). | Payload types 1, 3. |
+| `nic_supplement_a` | `nic_supplement_a` (bare `int`; ours is `bool`) | The one NIC supplement bit UAT has (1090 has two). | Payload types 1, 3. |
 | ❌ | `no_above` | Whether the RA is a "do not climb above" restriction. | N/A — not decoded by pyModeS978. 1090 only, BDS 3,0. |
 | ❌ | `no_below` | Whether the RA is a "do not descend below" restriction. | N/A — not decoded by pyModeS978. 1090 only, BDS 3,0. |
 | ❌ | `no_left` | Whether the RA is a "do not turn left" restriction (rare horizontal RA variant). | N/A — not decoded by pyModeS978. 1090 only, BDS 3,0. |
 | ❌ | `no_right` | Whether the RA is a "do not turn right" restriction. | N/A — not decoded by pyModeS978. 1090 only, BDS 3,0. |
 | ❌ | `nuc_p` | Navigation Uncertainty Category for Position — the older, pre-NIC/NACp accuracy metric BDS 0,5 also carries for backward compatibility. | N/A — not decoded by pyModeS978. 1090 only, BDS 0,5. |
-| ❌ | `operational_mode` | Raw operational mode bitfield (packs the `tcas_ra_active`/`ident_active`/`atc_services`-equivalent bits together instead of naming them individually). | N/A — not decoded by pyModeS978. 1090 only, BDS 6,5. |
+| ❌ | `operational_mode` | Raw operational mode bitfield -- the packed equivalent of `tcas_ra_active`/`ident_active`/`atc_services`, exposed here as individually named booleans instead. | N/A — not decoded by pyModeS978. 1090 only, BDS 6,5. |
 | ❌ | `overlay_command_capability` | Whether the transponder supports the overlay command capability. | N/A — not decoded by pyModeS978. 1090 only, BDS 1,0. |
 | `payload_type` | ❌ | `PayloadType` enum, 5-bit raw — determines which blocks (State Vector/Mode Status/AUX SV) are present in this frame. Named values: `SHORT`, `LONG`, `SHORT_AUX`, `SHORT_MS`; other raw values (4–31) fall back to the plain int. | All payload types. |
 | `position_accuracy_epu_m` | ❌ (see above) | Estimated Position Uncertainty, meters (95%), from `nac_p`. | Payload types 1, 3. |
