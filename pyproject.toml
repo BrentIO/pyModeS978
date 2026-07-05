@@ -8,7 +8,7 @@ version = "9999.99.99"
 description = "Pure-Python decoder for UAT (978 MHz) frames"
 readme = "README.md"
 license = "MIT"
-requires-python = ">=3.11"
+requires-python = ">=3.14"
 authors = [
     { name = "Brent I/O" },
 ]
