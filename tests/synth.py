@@ -81,7 +81,7 @@ def build_frame(
     category: int = 0,
     callsign: str | None = None,
     squawk: str | None = None,
-    emergency: int = 0,
+    emergency_state: int = 0,
     version: int = 0,
     sil: int = 0,
     transmit_mso: int = 0,
@@ -156,7 +156,7 @@ def build_frame(
         fields.append((136, 16, word1))
         fields.append((152, 16, word2))
         fields.append((168, 16, word3))
-        fields.append((184, 3, emergency))
+        fields.append((184, 3, emergency_state))
         fields.append((187, 3, version))
         fields.append((190, 2, sil))
         fields.append((192, 6, transmit_mso))
