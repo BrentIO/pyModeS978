@@ -9,7 +9,6 @@ _DIMENSIONS_WIDTHS_M = [
 ]
 
 _AIRGROUND_STRINGS = {0: "airborne", 1: "airborne", 2: "ground", 3: "reserved"}
-_TRACK_TYPES = {1: "track", 2: "magnetic_heading", 3: "true_heading"}
 _TISB_ADDRESS_QUALIFIERS = {2, 3}
 
 FIELDS = (
@@ -21,9 +20,10 @@ FIELDS = (
     "airground_state",
     "groundspeed",
     "track",
-    "track_type",
+    "heading",
+    "heading_type",
     "vertical_rate",
-    "vertical_rate_source",
+    "vr_source",
     "length",
     "width",
     "position_offset",
@@ -55,17 +55,15 @@ def decode(payload: bytes, address_qualifier: AddressQualifier | int) -> dict:
     raw_airground = read_uint(payload, 96, 2)
     airground_state = _AIRGROUND_STRINGS[raw_airground]
 
-    groundspeed = track = track_type = None
-    vertical_rate = vertical_rate_source = None
+    groundspeed = track = heading = heading_type = None
+    vertical_rate = vr_source = None
     length = width = position_offset = None
 
     if raw_airground in (0, 1):
-        groundspeed, track, track_type = _decode_airborne_velocity(
-            payload, supersonic=raw_airground == 1
-        )
-        vertical_rate, vertical_rate_source = _decode_vertical_rate(payload)
+        groundspeed, track = _decode_airborne_velocity(payload, supersonic=raw_airground == 1)
+        vertical_rate, vr_source = _decode_vertical_rate(payload)
     elif raw_airground == 2:
-        groundspeed, track, track_type = _decode_ground_velocity(payload)
+        groundspeed, track, heading, heading_type = _decode_ground_velocity(payload)
         length, width, position_offset = _decode_dimensions(payload)
     # raw_airground == 3 (reserved): no velocity/vertical-rate/dimensions defined
 
@@ -84,9 +82,10 @@ def decode(payload: bytes, address_qualifier: AddressQualifier | int) -> dict:
         "airground_state": airground_state,
         "groundspeed": groundspeed if groundspeed is None else round(groundspeed),
         "track": track if track is None else round(track),
-        "track_type": track_type,
+        "heading": heading if heading is None else round(heading),
+        "heading_type": heading_type,
         "vertical_rate": vertical_rate,
-        "vertical_rate_source": vertical_rate_source,
+        "vr_source": vr_source,
         "length": length,
         "width": width,
         "position_offset": position_offset,
@@ -113,14 +112,14 @@ def _decode_airborne_velocity(payload: bytes, *, supersonic: bool):
     ew = _decode_signed_velocity(payload, 110, supersonic)
 
     if ns is None or ew is None:
-        return None, None, None
+        return None, None
 
     groundspeed = math.sqrt(ns * ns + ew * ew)
     if ns == 0 and ew == 0:
-        return groundspeed, None, None
+        return groundspeed, None
 
     track = (360 + 90 - math.degrees(math.atan2(ns, ew))) % 360
-    return groundspeed, track, "track"
+    return groundspeed, track
 
 
 def _decode_ground_velocity(payload: bytes):
@@ -129,13 +128,14 @@ def _decode_ground_velocity(payload: bytes):
     groundspeed = None if gs_magnitude == 0 else gs_magnitude - 1
 
     raw_track = read_uint(payload, 110, 11)
-    track_type_code = (raw_track >> 9) & 0x03
-    track_type = _TRACK_TYPES.get(track_type_code)
-    track = None
-    if track_type is not None:
-        track = (raw_track & 0x1FF) * 360 / 512
+    type_code = (raw_track >> 9) & 0x03
+    value = (raw_track & 0x1FF) * 360 / 512 if type_code else None
 
-    return groundspeed, track, track_type
+    track = value if type_code == 1 else None
+    heading = value if type_code in (2, 3) else None
+    heading_type = {2: "magnetic", 3: "true"}.get(type_code)
+
+    return groundspeed, track, heading, heading_type
 
 
 def _decode_vertical_rate(payload: bytes):
@@ -146,7 +146,7 @@ def _decode_vertical_rate(payload: bytes):
     value = (magnitude - 1) * 64
     if raw & 0x200:
         value = -value
-    source = "baro" if raw & 0x400 else "geo"
+    source = "BARO" if raw & 0x400 else "GNSS"
     return value, source
 
 

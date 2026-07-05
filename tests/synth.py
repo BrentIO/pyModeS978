@@ -69,18 +69,18 @@ def build_frame(
     track: float | None = None,
     track_type_code: int = 1,  # 1=track, 2=magnetic_heading, 3=true_heading
     vertical_rate: int | None = None,
-    vertical_rate_source: str = "geo",
+    vr_source: str = "GNSS",
     length_code: int = 0,
     width_code: int = 0,
     position_offset: bool = False,
     utc_coupled: bool = False,
     tisb_site_id: int = 0,
     # Mode Status
-    emitter_category: int = 0,
+    category: int = 0,
     callsign: str | None = None,
     squawk: str | None = None,
     emergency: int = 0,
-    mops_version: int = 0,
+    version: int = 0,
     sil: int = 0,
     transmit_mso: int = 0,
     sda: int = 0,
@@ -96,7 +96,7 @@ def build_frame(
     sil_supplement: int = 0,
     gva: int = 0,
     single_antenna: bool = False,
-    nic_supplement: bool = False,
+    nic_supplement_a: bool = False,
     # AUX SV
     altitude_secondary: int | None = None,
 ) -> bytes:
@@ -124,7 +124,7 @@ def build_frame(
             raw_vvel = (abs(vertical_rate) // 64 + 1) & 0x1FF
             if vertical_rate < 0:
                 raw_vvel |= 0x200
-            if vertical_rate_source == "baro":
+            if vr_source == "BARO":
                 raw_vvel |= 0x400
             fields.append((121, 11, raw_vvel))
     elif airground_state == 2:
@@ -147,7 +147,7 @@ def build_frame(
         chars = [_BASE40_ALPHABET.index(" ")] * 8
         for i, ch in enumerate(callsign_text[:8]):
             chars[i] = _BASE40_ALPHABET.index(ch)
-        word1 = emitter_category * 1600 + chars[0] * 40 + chars[1]
+        word1 = category * 1600 + chars[0] * 40 + chars[1]
         word2 = chars[2] * 1600 + chars[3] * 40 + chars[4]
         word3 = chars[5] * 1600 + chars[6] * 40 + chars[7]
 
@@ -155,7 +155,7 @@ def build_frame(
         fields.append((152, 16, word2))
         fields.append((168, 16, word3))
         fields.append((184, 3, emergency))
-        fields.append((187, 3, mops_version))
+        fields.append((187, 3, version))
         fields.append((190, 2, sil))
         fields.append((192, 6, transmit_mso))
         fields.append((198, 2, sda))
@@ -172,7 +172,7 @@ def build_frame(
         fields.append((215, 1, sil_supplement))
         fields.append((216, 2, gva))
         fields.append((218, 1, 1 if single_antenna else 0))
-        fields.append((219, 1, 1 if nic_supplement else 0))
+        fields.append((219, 1, 1 if nic_supplement_a else 0))
 
     if payload_type in (1, 2, 5, 6):
         fields.append((232, 12, _encode_altitude(altitude_secondary)))
