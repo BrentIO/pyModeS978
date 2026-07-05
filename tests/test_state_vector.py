@@ -27,7 +27,7 @@ def test_airborne_position_altitude_velocity():
     assert result["latitude"] == pytest.approx(25.59999)
     assert result["longitude"] == pytest.approx(142.4)
     assert result["altitude"] == 23975
-    assert result["altitude_type"] == "baro"
+    assert result["altitude_type"] == "BARO"
     assert result["nic"] == 8
     assert result["airground_state"] == "airborne"
     assert result["groundspeed"] == round(math.sqrt(100**2 + 50**2))

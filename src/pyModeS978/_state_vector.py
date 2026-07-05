@@ -50,7 +50,7 @@ def decode(payload: bytes, address_qualifier: AddressQualifier | int) -> dict:
     altitude = altitude_type = None
     if raw_alt != 0:
         altitude = (raw_alt - 1) * 25 - 1000
-        altitude_type = "geo" if read_uint(payload, 79, 1) else "baro"
+        altitude_type = "GNSS" if read_uint(payload, 79, 1) else "BARO"
 
     raw_airground = read_uint(payload, 96, 2)
     airground_state = _AIRGROUND_STRINGS[raw_airground]

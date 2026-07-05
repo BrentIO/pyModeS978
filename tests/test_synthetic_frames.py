@@ -36,10 +36,10 @@ def test_altitude_unavailable():
 
 
 def test_altitude_available():
-    frame = build_frame(payload_type=0, altitude=35000, altitude_type="geo")
+    frame = build_frame(payload_type=0, altitude=35000, altitude_type="GNSS")
     result = pyModeS978.decode(frame.hex())
     assert result["altitude"] == 35000
-    assert result["altitude_type"] == "geo"
+    assert result["altitude_type"] == "GNSS"
 
 
 def test_airborne_velocity_and_vertical_rate():
@@ -160,10 +160,10 @@ def test_blank_mode_status_field():
 
 
 def test_aux_sv_present_with_opposite_type():
-    frame = build_frame(payload_type=1, altitude_type="baro", altitude_secondary=5000)
+    frame = build_frame(payload_type=1, altitude_type="BARO", altitude_secondary=5000)
     result = pyModeS978.decode(frame.hex())
     assert result["altitude_secondary"] == 5000
-    assert result["altitude_secondary_type"] == "geo"
+    assert result["altitude_secondary_type"] == "GNSS"
 
 
 def test_aux_sv_absent_for_sv_only_type():
