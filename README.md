@@ -28,8 +28,8 @@ result = pyModeS978.decode(raw)   # dict | None
 `;metadata` is stripped if present. If the prefix is omitted, direction is inferred from byte length instead.
 Uplink frames (FIS-B weather/NOTAM ground broadcasts) always decode to `None` — they carry no traffic data,
 and 1090 traffic rebroadcast to UAT receivers (TIS-B/ADS-R) already arrives as a downlink frame, distinguished
-via `address_qualifier`. `None` here is expected behavior, not an error -- see [Errors](#errors) for what
-actually raises.
+via `address_qualifier`. `None` here is expected behavior, not an error -- see [Error Handling](#error-handling)
+for what actually raises.
 
 Fields not applicable to a given frame's `payload_type` are present with value `None`, never omitted. Keys are
 sorted alphabetically, so a specific field is easy to find in printed output. Real example output (a
@@ -108,15 +108,15 @@ and `vr_source` all share the same `AltitudeSource` enum (`BARO`/`GNSS`).
 
 ## Error Handling
 
-Malformed input to `decode()` raises one of three `DecodeError` subclasses, rather than returning `None` --
+Malformed input to `decode()` raises one of three `DecodeError` subclasses, rather than returning `None`.
 `None` is reserved for uplink frames (see [Usage](#usage)). `DecodeError` itself subclasses `ValueError`, so
 `except ValueError:` catches any of them:
 
-- `InvalidHexError`: `raw` contains non-hex characters, or an odd number of hex characters.
+- `InvalidHexError`: the input contains non-hex characters, or an odd number of hex characters.
 - `InvalidLengthError`: the decoded payload isn't 18, 34, or 432 bytes.
-- `DirectionMismatchError`: the `-`/`+` prefix disagrees with the direction implied by the byte length.
+- `DirectionMismatchError`: the `-`/`+` prefix disagrees with the direction implied by the payload's byte length.
 
-Every one of them carries the original `raw` input you passed to `decode()` as `.raw`, unmodified — useful for
+Every error type carries the original input passed to `decode()` as `.raw`, unmodified. This is useful for
 correlating a failure back to its source record.
 
 ## Data dictionary
