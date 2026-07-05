@@ -1,6 +1,7 @@
 import math
 
 import pytest
+from synth import pack as _pack
 
 from pyModeS978._state_vector import decode
 
@@ -83,14 +84,6 @@ def test_ground_speed_track_and_dimensions():
     # Vertical rate is not defined on the ground -- those bits are dimensions instead.
     assert result["vertical_rate"] is None
     assert result["vertical_rate_source"] is None
-
-
-def _pack(nbytes: int, fields: list[tuple[int, int, int]]) -> bytes:
-    value = 0
-    for start_bit, num_bits, field_value in fields:
-        shift = nbytes * 8 - start_bit - num_bits
-        value |= (field_value & ((1 << num_bits) - 1)) << shift
-    return value.to_bytes(nbytes, "big")
 
 
 def test_supersonic_velocity_multiplier():

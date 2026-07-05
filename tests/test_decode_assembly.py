@@ -1,12 +1,6 @@
+from synth import pack as _pack
+
 import pyModeS978
-
-
-def _pack(nbytes: int, fields: list[tuple[int, int, int]]) -> bytes:
-    value = 0
-    for start_bit, num_bits, field_value in fields:
-        shift = nbytes * 8 - start_bit - num_bits
-        value |= (field_value & ((1 << num_bits) - 1)) << shift
-    return value.to_bytes(nbytes, "big")
 
 
 def _frame_with_payload_type(payload_type: int) -> bytes:

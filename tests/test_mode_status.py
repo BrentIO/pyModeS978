@@ -1,3 +1,5 @@
+from synth import pack as _pack
+
 from pyModeS978._enums import Emergency, EmitterCategory, SILSupplement
 from pyModeS978._mode_status import decode
 
@@ -67,14 +69,6 @@ def test_blank_field_yields_neither_callsign_nor_squawk():
     assert result["squawk"] is None
     assert result["emitter_category"] is EmitterCategory.HEAVY
     assert result["emergency"] is Emergency.RESERVED_7
-
-
-def _pack(nbytes: int, fields: list[tuple[int, int, int]]) -> bytes:
-    value = 0
-    for start_bit, num_bits, field_value in fields:
-        shift = nbytes * 8 - start_bit - num_bits
-        value |= (field_value & ((1 << num_bits) - 1)) << shift
-    return value.to_bytes(nbytes, "big")
 
 
 def test_reserved_emergency_code_still_decodes():
