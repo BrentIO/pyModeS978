@@ -57,6 +57,7 @@ def test_airborne_velocity_and_vertical_rate():
     assert result["track"] == round((360 + 90 - math.degrees(math.atan2(100, -50))) % 360, 1)
     assert result["heading"] is None
     assert result["heading_type"] is None
+    assert result["magnetic_heading"] is None
     assert result["vertical_rate"] == -640
     assert result["vr_source"] == AltitudeSource.BARO
 
@@ -82,6 +83,7 @@ def test_ground_velocity_and_track():
     assert result["track"] == 271.4
     assert result["heading"] is None
     assert result["heading_type"] is None
+    assert result["magnetic_heading"] is None
     assert result["vertical_rate"] is None
 
 
@@ -96,6 +98,7 @@ def test_ground_magnetic_heading():
     assert result["track"] is None
     assert result["heading"] == 271.4
     assert result["heading_type"] == HeadingType.MAGNETIC
+    assert result["magnetic_heading"] == 271.4
 
 
 def test_ground_dimensions():
