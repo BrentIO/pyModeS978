@@ -21,6 +21,7 @@ class ParsedFrame:
 
 
 def parse(raw: str) -> ParsedFrame | None:
+    original_raw = raw
     raw = raw.split(";", 1)[0]
 
     asserted_direction = None
@@ -32,7 +33,7 @@ def parse(raw: str) -> ParsedFrame | None:
         raw = raw[1:]
 
     if not raw or len(raw) % 2 != 0 or not _HEX_RE.match(raw):
-        raise InvalidHexError(raw)
+        raise InvalidHexError(original_raw)
 
     payload = bytes.fromhex(raw)
     length = len(payload)
@@ -42,10 +43,12 @@ def parse(raw: str) -> ParsedFrame | None:
     elif length == _UPLINK_LENGTH:
         direction = "uplink"
     else:
-        raise InvalidLengthError(actual=length)
+        raise InvalidLengthError(raw=original_raw, actual=length)
 
     if asserted_direction is not None and asserted_direction != direction:
-        raise DirectionMismatchError(asserted=asserted_direction, actual=direction)
+        raise DirectionMismatchError(
+            raw=original_raw, asserted=asserted_direction, actual=direction
+        )
 
     if direction == "uplink":
         return None

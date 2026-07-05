@@ -77,12 +77,14 @@ def test_mismatched_prefix_and_length_raises():
         parse("-" + _UPLINK)
     assert exc_info.value.asserted == "downlink"
     assert exc_info.value.actual == "uplink"
+    assert exc_info.value.raw == "-" + _UPLINK
 
     # "+" (uplink) prefix on a valid downlink-length payload is contradictory
     with pytest.raises(DirectionMismatchError) as exc_info:
         parse("+" + _SHORT_DOWNLINK)
     assert exc_info.value.asserted == "uplink"
     assert exc_info.value.actual == "downlink"
+    assert exc_info.value.raw == "+" + _SHORT_DOWNLINK
 
 
 def test_invalid_length_raises():
@@ -90,12 +92,22 @@ def test_invalid_length_raises():
         parse("00" * 20)  # not 18, 34, or 432 bytes
     assert exc_info.value.actual == 20
     assert exc_info.value.expected == (18, 34, 432)
+    assert exc_info.value.raw == "00" * 20
 
 
 def test_non_hex_characters_raises():
     with pytest.raises(InvalidHexError) as exc_info:
         parse("ZZ" + _SHORT_DOWNLINK[2:])
     assert exc_info.value.raw == "ZZ" + _SHORT_DOWNLINK[2:]
+
+
+def test_invalid_hex_error_raw_is_the_original_unstripped_input():
+    # .raw should be the full original input (prefix and metadata intact),
+    # not the intermediate string left after stripping either of them.
+    bad = "-ZZ" + _SHORT_DOWNLINK[2:] + ";t=123.456"
+    with pytest.raises(InvalidHexError) as exc_info:
+        parse(bad)
+    assert exc_info.value.raw == bad
 
 
 def test_odd_length_hex_raises():
