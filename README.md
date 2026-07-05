@@ -173,7 +173,7 @@ Two recurring patterns, noted once here instead of in every row:
 | ❌ | `cpr_lon` | Raw, un-decoded CPR-encoded longitude. | — | 1090 only, BDS 0,5/0,6. |
 | ❌ | `crc_valid` | Whether the message's CRC checksum passed. | — | 1090 only, DF17/18/20/21. |
 | ❌ | `cross_link_capability` | Whether the transponder can support DF16 replies. | — | 1090 only, DF0. |
-| ❌ | `df` | Downlink Format — the 5-bit code identifying which of ~10 different Mode S/ADS-B message formats a 1090 reply is. | — | 1090 only, always present; no UAT equivalent structurally, though `payload_type` plays an analogous dispatch role. |
+| ❌ | `df` | Downlink Format — the 5-bit code identifying which of ~10 different Mode S/ADS-B message formats a 1090 reply is. | — | 1090 only, always present; no UAT equivalent structurally, though `payload_type` serves a similar use. |
 | ❌ | `downlink_elm_throughput` | Downlink Extended Length Message throughput capability. | — | 1090 only, BDS 1,0. |
 | ❌ | `downlink_request` | Whether the transponder has more data queued to send. | — | 1090 only, DF4/5/20/21. |
 | ❌ | `downward_sense` | Whether the RA commands a downward sense. | — | 1090 only, BDS 3,0. |
@@ -274,7 +274,7 @@ Two recurring patterns, noted once here instead of in every row:
 | ❌ | `true_airspeed` | True airspeed, knots. | — | 1090 only, BDS 5,0. |
 | ❌ | `true_track` | True track angle, degrees. | — | 1090 only, BDS 5,0. |
 | ❌ | `turbulence` | Turbulence intensity code. | — | 1090 only, BDS 4,4. |
-| ❌ | `typecode` | ADS-B typecode (bits 33–37 of DF17/18) — which BDS register/subtype a message carries. | — | 1090 only, DF17/18; no UAT equivalent structurally, though `payload_type` plays an analogous dispatch role. |
+| ❌ | `typecode` | ADS-B typecode (bits 33–37 of DF17/18) — which BDS register/subtype a message carries. | — | 1090 only, DF17/18; no UAT equivalent structurally, though `payload_type` serves a similar use. |
 | `uat_in` | ❌ (`capability_class` bitfield, see above) | Capability code — has a UAT receiver. | 1, 3 | — |
 | ❌ | `uplink_elm_throughput` | Uplink Extended Length Message throughput capability. | — | 1090 only, BDS 1,0. |
 | `utc_coupled` | ❌ | Whether the frame's time reference is UTC-coupled. | 0–10 | Native ADS-B (non-TIS-B `address_qualifier`) only. |
