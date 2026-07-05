@@ -54,7 +54,7 @@ def test_airborne_velocity_and_vertical_rate():
     result = pyModeS978.decode(frame.hex())
     assert result["airground_state"] == "airborne"
     assert result["groundspeed"] == round(math.sqrt(100**2 + 50**2))
-    assert result["track"] == round((360 + 90 - math.degrees(math.atan2(100, -50))) % 360)
+    assert result["track"] == round((360 + 90 - math.degrees(math.atan2(100, -50))) % 360, 1)
     assert result["heading"] is None
     assert result["heading_type"] is None
     assert result["vertical_rate"] == -640
@@ -65,7 +65,7 @@ def test_supersonic_velocity_multiplier():
     frame = build_frame(payload_type=0, airground_state=1, ns_velocity=40, ew_velocity=40)
     result = pyModeS978.decode(frame.hex())
     assert result["groundspeed"] == round(math.sqrt(40**2 + 40**2))
-    assert result["track"] == 45
+    assert result["track"] == 45.0
 
 
 def test_ground_velocity_and_track():
@@ -79,7 +79,7 @@ def test_ground_velocity_and_track():
     result = pyModeS978.decode(frame.hex())
     assert result["airground_state"] == "ground"
     assert result["groundspeed"] == 50
-    assert result["track"] == 271
+    assert result["track"] == 271.4
     assert result["heading"] is None
     assert result["heading_type"] is None
     assert result["vertical_rate"] is None
@@ -94,7 +94,7 @@ def test_ground_magnetic_heading():
     )
     result = pyModeS978.decode(frame.hex())
     assert result["track"] is None
-    assert result["heading"] == 271
+    assert result["heading"] == 271.4
     assert result["heading_type"] == "magnetic"
 
 

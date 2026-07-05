@@ -31,7 +31,7 @@ def test_airborne_position_altitude_velocity():
     assert result["nic"] == 8
     assert result["airground_state"] == "airborne"
     assert result["groundspeed"] == round(math.sqrt(100**2 + 50**2))
-    assert result["track"] == 333
+    assert result["track"] == 333.4
     assert result["heading"] is None
     assert result["heading_type"] is None
     assert result["vertical_rate"] == 640
@@ -78,7 +78,7 @@ def test_ground_speed_track_and_dimensions():
     result = decode(bytes.fromhex(_GROUND_HEX), address_qualifier=0)
     assert result["airground_state"] == "ground"
     assert result["groundspeed"] == 50
-    assert result["track"] == 271
+    assert result["track"] == 271.4
     assert result["heading"] is None
     assert result["heading_type"] is None
     assert result["length"] == 85
@@ -104,7 +104,7 @@ def test_supersonic_velocity_multiplier():
     assert result["airground_state"] == "airborne"
     # magnitude 11 -> 10 kt, x4 for supersonic -> 40 kt on each axis
     assert result["groundspeed"] == round(math.sqrt(40**2 + 40**2))
-    assert result["track"] == 45  # equal N/S and E/W -> 45 degrees
+    assert result["track"] == 45.0  # equal N/S and E/W -> 45 degrees
 
 
 def test_ground_invalid_type_code():
@@ -129,7 +129,7 @@ def test_ground_magnetic_heading():
     payload = _pack(18, [(96, 2, 2), (110, 11, raw_track)])
     result = decode(payload, address_qualifier=0)
     assert result["track"] is None
-    assert result["heading"] == 271
+    assert result["heading"] == 271.4
     assert result["heading_type"] == "magnetic"
 
 
@@ -139,5 +139,5 @@ def test_ground_true_heading():
     payload = _pack(18, [(96, 2, 2), (110, 11, raw_track)])
     result = decode(payload, address_qualifier=0)
     assert result["track"] is None
-    assert result["heading"] == 271
+    assert result["heading"] == 271.4
     assert result["heading_type"] == "true"
