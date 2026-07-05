@@ -11,7 +11,7 @@ def decode(payload: bytes) -> dict:
         altitude_secondary = (raw_alt - 1) * 25 - 1000
         # Opposite of the primary altitude's type -- same bit State Vector reads for its
         # own altitude_type (bit 79), ternary inverted.
-        altitude_secondary_type = "baro" if read_uint(payload, 79, 1) else "geo"
+        altitude_secondary_type = "BARO" if read_uint(payload, 79, 1) else "GNSS"
 
     return {
         "altitude_secondary": altitude_secondary,

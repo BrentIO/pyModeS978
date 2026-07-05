@@ -61,7 +61,7 @@ def build_frame(
     longitude: float | None = None,
     nic: int = 0,
     altitude: int | None = None,
-    altitude_type: str = "baro",
+    altitude_type: str = "BARO",
     airground_state: int = 0,  # 0=airborne subsonic, 1=supersonic, 2=ground, 3=reserved
     ns_velocity: int | None = None,
     ew_velocity: int | None = None,
@@ -110,7 +110,7 @@ def build_frame(
         (8, 24, icao),
         (32, 23, _encode_lat(latitude) if latitude is not None else 0),
         (55, 24, _encode_lon(longitude) if longitude is not None else 0),
-        (79, 1, 1 if altitude_type == "geo" else 0),
+        (79, 1, 1 if altitude_type == "GNSS" else 0),
         (80, 12, _encode_altitude(altitude)),
         (92, 4, nic),
         (96, 2, airground_state),
