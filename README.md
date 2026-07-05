@@ -25,9 +25,16 @@ result = pyModeS978.decode(raw)   # dict | None
 ```
 
 `raw` is accepted with or without the dump978-fa direction prefix (`-` = downlink, `+` = uplink); trailing
-`;metadata` is stripped if present. Uplink frames (FIS-B weather/NOTAM ground broadcasts) always decode to
-`None` — they carry no traffic data, and 1090 traffic rebroadcast to UAT receivers (TIS-B/ADS-R) already
-arrives as a downlink frame, distinguished via `address_qualifier`.
+`;metadata` is stripped if present. If the prefix is omitted, direction is inferred from byte length instead.
+Uplink frames (FIS-B weather/NOTAM ground broadcasts) always decode to `None` — they carry no traffic data,
+and 1090 traffic rebroadcast to UAT receivers (TIS-B/ADS-R) already arrives as a downlink frame, distinguished
+via `address_qualifier`. `None` here is expected behavior, not an error.
+
+Malformed input raises instead: `InvalidHexError` (non-hex characters, or an odd number of hex characters),
+`InvalidLengthError` (not 18, 34, or 432 bytes), or `DirectionMismatchError` (the `-`/`+` prefix disagrees with
+the direction implied by the byte length). All three subclass `DecodeError`, itself a `ValueError` subclass, so
+`except ValueError:` catches any of them. Every one of them carries the original `raw` input you passed to
+`decode()` as `.raw`, unmodified — useful for correlating a failure back to its source record.
 
 Fields not applicable to a given frame's `payload_type` are present with value `None`, never omitted. Keys are
 sorted alphabetically, so a specific field is easy to find in printed output. Real example output (a
