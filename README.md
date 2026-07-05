@@ -43,7 +43,7 @@ example output (a long-frame ADS-B message: HDR + State Vector + Mode Status + A
     'nic': 9,
     'airground_state': 'airborne',
     'groundspeed': 486,
-    'track': 357,
+    'track': 357.3,
     'heading': None,
     'heading_type': None,
     'vertical_rate': 832,
