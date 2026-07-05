@@ -4,11 +4,11 @@ from ._enums import Emergency, EmitterCategory, SILSupplement, coerce
 _BASE40_ALPHABET = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ  .."
 
 FIELDS = (
-    "emitter_category",
+    "category",
     "callsign",
     "squawk",
     "emergency",
-    "mops_version",
+    "version",
     "sil",
     "transmit_mso",
     "sda",
@@ -24,7 +24,7 @@ FIELDS = (
     "sil_supplement",
     "gva",
     "single_antenna",
-    "nic_supplement",
+    "nic_supplement_a",
 )
 
 
@@ -41,7 +41,7 @@ def decode(payload: bytes) -> dict:
     group2 = read_uint(payload, 152, 16)
     group3 = read_uint(payload, 168, 16)
 
-    emitter_category = coerce(EmitterCategory, (group1 // 1600) % 40)
+    category = coerce(EmitterCategory, (group1 // 1600) % 40)
     chars = _base40_chars(group1)[1:] + _base40_chars(group2) + _base40_chars(group3)
 
     callsign = squawk = None
@@ -53,7 +53,7 @@ def decode(payload: bytes) -> dict:
             squawk = text
 
     emergency = coerce(Emergency, read_uint(payload, 184, 3))
-    mops_version = read_uint(payload, 187, 3)
+    version = read_uint(payload, 187, 3)
     sil = read_uint(payload, 190, 2)
     transmit_mso = read_uint(payload, 192, 6)
     sda = read_uint(payload, 198, 2)
@@ -74,14 +74,14 @@ def decode(payload: bytes) -> dict:
     sil_supplement = coerce(SILSupplement, read_uint(payload, 215, 1))
     gva = read_uint(payload, 216, 2)
     single_antenna = bool(read_uint(payload, 218, 1))
-    nic_supplement = bool(read_uint(payload, 219, 1))
+    nic_supplement_a = bool(read_uint(payload, 219, 1))
 
     return {
-        "emitter_category": emitter_category,
+        "category": category,
         "callsign": callsign,
         "squawk": squawk,
         "emergency": emergency,
-        "mops_version": mops_version,
+        "version": version,
         "sil": sil,
         "transmit_mso": transmit_mso,
         "sda": sda,
@@ -97,5 +97,5 @@ def decode(payload: bytes) -> dict:
         "sil_supplement": sil_supplement,
         "gva": gva,
         "single_antenna": single_antenna,
-        "nic_supplement": nic_supplement,
+        "nic_supplement_a": nic_supplement_a,
     }

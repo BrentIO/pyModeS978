@@ -44,19 +44,20 @@ example output (a long-frame ADS-B message: HDR + State Vector + Mode Status + A
     'airground_state': 'airborne',
     'groundspeed': 486,
     'track': 357,
-    'track_type': 'track',
+    'heading': None,
+    'heading_type': None,
     'vertical_rate': 832,
-    'vertical_rate_source': 'baro',
+    'vr_source': 'BARO',
     'length': None,
     'width': None,
     'position_offset': None,
     'utc_coupled': True,
     'tisb_site_id': None,
-    'emitter_category': EmitterCategory.MEDIUM,
+    'category': EmitterCategory.MEDIUM,
     'callsign': 'N116FE',
     'squawk': None,
     'emergency': Emergency.NO_EMERGENCY,
-    'mops_version': 2,
+    'version': 2,
     'sil': 3,
     'sil_supplement': SILSupplement.PER_HOUR,
     'transmit_mso': 35,
@@ -64,7 +65,7 @@ example output (a long-frame ADS-B message: HDR + State Vector + Mode Status + A
     'nac_p': 10,
     'nac_v': 2,
     'nic_baro': True,
-    'nic_supplement': False,
+    'nic_supplement_a': False,
     'gva': 2,
     'single_antenna': False,
     'uat_in': True,
@@ -87,9 +88,9 @@ example output (a long-frame ADS-B message: HDR + State Vector + Mode Status + A
 ```
 
 `position_containment_radius_m`/`position_vpl_m` are `None` here because `nic=9` is only resolvable when
-`nic_supplement=True` — a real, expected gap in the underlying table, not a bug (see `_uncertainty.py`).
+`nic_supplement_a=True` — a real, expected gap in the underlying table, not a bug (see `_uncertainty.py`).
 
-`payload_type`, `address_qualifier`, `emitter_category`, `emergency`, and `sil_supplement` are `IntEnum`s (still
+`payload_type`, `address_qualifier`, `category`, `emergency`, and `sil_supplement` are `IntEnum`s (still
 compare/hash equal to their plain-int value) with a fallback to the plain int for any raw value that isn't a
 named member.
 

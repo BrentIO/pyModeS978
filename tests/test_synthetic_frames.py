@@ -49,15 +49,16 @@ def test_airborne_velocity_and_vertical_rate():
         ns_velocity=100,
         ew_velocity=-50,
         vertical_rate=-640,
-        vertical_rate_source="baro",
+        vr_source="BARO",
     )
     result = pyModeS978.decode(frame.hex())
     assert result["airground_state"] == "airborne"
     assert result["groundspeed"] == round(math.sqrt(100**2 + 50**2))
     assert result["track"] == round((360 + 90 - math.degrees(math.atan2(100, -50))) % 360)
-    assert result["track_type"] == "track"
+    assert result["heading"] is None
+    assert result["heading_type"] is None
     assert result["vertical_rate"] == -640
-    assert result["vertical_rate_source"] == "baro"
+    assert result["vr_source"] == "BARO"
 
 
 def test_supersonic_velocity_multiplier():
@@ -79,8 +80,22 @@ def test_ground_velocity_and_track():
     assert result["airground_state"] == "ground"
     assert result["groundspeed"] == 50
     assert result["track"] == 271
-    assert result["track_type"] == "track"
+    assert result["heading"] is None
+    assert result["heading_type"] is None
     assert result["vertical_rate"] is None
+
+
+def test_ground_magnetic_heading():
+    frame = build_frame(
+        payload_type=0,
+        airground_state=2,
+        track=271.40625,
+        track_type_code=2,
+    )
+    result = pyModeS978.decode(frame.hex())
+    assert result["track"] is None
+    assert result["heading"] == 271
+    assert result["heading_type"] == "magnetic"
 
 
 def test_ground_dimensions():
@@ -123,11 +138,11 @@ def test_native_adsb_yields_utc_coupled_not_site_id():
 
 
 def test_callsign_case():
-    frame = build_frame(payload_type=1, callsign="N12345", emitter_category=1)
+    frame = build_frame(payload_type=1, callsign="N12345", category=1)
     result = pyModeS978.decode(frame.hex())
     assert result["callsign"] == "N12345"
     assert result["squawk"] is None
-    assert result["emitter_category"] is EmitterCategory.LIGHT
+    assert result["category"] is EmitterCategory.LIGHT
 
 
 def test_squawk_case():
@@ -159,14 +174,14 @@ def test_aux_sv_absent_for_sv_only_type():
 
 
 def test_nic_containment_radius_resolvable():
-    frame = build_frame(payload_type=1, nic=11, nic_supplement=False)
+    frame = build_frame(payload_type=1, nic=11, nic_supplement_a=False)
     result = pyModeS978.decode(frame.hex())
     assert result["position_containment_radius_m"] == 7.5
     assert result["position_vpl_m"] == 11
 
 
 def test_nic_containment_radius_unresolvable_combination():
-    frame = build_frame(payload_type=1, nic=9, nic_supplement=False)
+    frame = build_frame(payload_type=1, nic=9, nic_supplement_a=False)
     result = pyModeS978.decode(frame.hex())
     assert result["position_containment_radius_m"] is None
 
@@ -195,7 +210,7 @@ def test_payload_type_dispatch(payload_type, has_sv, has_ms, has_auxsv):
         payload_type=payload_type,
         nic=5,
         callsign="N12345",
-        emitter_category=1,
+        category=1,
         altitude_secondary=5000,
     )
     result = pyModeS978.decode(frame.hex())

@@ -3,7 +3,7 @@
 #
 # NIC -> containment radius is the one UAT-specific judgment call: 1090 needs two
 # supplement bits (hence pyModeS has both NICv1 and NICv2 tables), but UAT only has
-# one (nic_supplement, #22) -- there's no second bit hiding anywhere (confirmed via
+# one (nic_supplement_a, #22) -- there's no second bit hiding anywhere (confirmed via
 # FlightAware's dump978, which marks State Vector's otherwise-unused bit as reserved,
 # not a second NIC supplement). So only the single-supplement NICv1 table applies here.
 
@@ -41,7 +41,7 @@ _SIL = {
     0: (None, None),
 }
 
-# (nic, int(nic_supplement)) -> (Rc meters, VPL meters). Some combinations have no
+# (nic, int(nic_supplement_a)) -> (Rc meters, VPL meters). Some combinations have no
 # entry at all (e.g. nic=9 is only defined for supplement=1) -- faithfully mirrored
 # as None, not guessed at.
 _NIC_V1 = {
@@ -72,11 +72,11 @@ FIELDS = (
 )
 
 
-def derive(*, nic: int, nic_supplement: bool, nac_p: int, nac_v: int, sil: int) -> dict:
+def derive(*, nic: int, nic_supplement_a: bool, nac_p: int, nac_v: int, sil: int) -> dict:
     epu, vepu = _NACP.get(nac_p, (None, None))
     hfom, vfom = _NACV.get(nac_v, (None, None))
     pe_rcu, pe_vpl = _SIL.get(sil, (None, None))
-    rc, vpl = _NIC_V1.get((nic, int(nic_supplement)), (None, None))
+    rc, vpl = _NIC_V1.get((nic, int(nic_supplement_a)), (None, None))
 
     return {
         "position_accuracy_epu_m": epu,

@@ -30,7 +30,7 @@ def decode(raw: str) -> dict | None:
         result.update(
             _uncertainty.derive(
                 nic=result["nic"],
-                nic_supplement=result["nic_supplement"],
+                nic_supplement_a=result["nic_supplement_a"],
                 nac_p=result["nac_p"],
                 nac_v=result["nac_v"],
                 sil=result["sil"],

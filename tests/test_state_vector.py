@@ -32,9 +32,10 @@ def test_airborne_position_altitude_velocity():
     assert result["airground_state"] == "airborne"
     assert result["groundspeed"] == round(math.sqrt(100**2 + 50**2))
     assert result["track"] == 333
-    assert result["track_type"] == "track"
+    assert result["heading"] is None
+    assert result["heading_type"] is None
     assert result["vertical_rate"] == 640
-    assert result["vertical_rate_source"] == "baro"
+    assert result["vr_source"] == "BARO"
     assert result["utc_coupled"] is True
     assert result["tisb_site_id"] is None
     assert result["length"] is None
@@ -59,9 +60,10 @@ def test_no_position_and_reserved_airground_state():
     assert result["airground_state"] == "reserved"
     assert result["groundspeed"] is None
     assert result["track"] is None
-    assert result["track_type"] is None
+    assert result["heading"] is None
+    assert result["heading_type"] is None
     assert result["vertical_rate"] is None
-    assert result["vertical_rate_source"] is None
+    assert result["vr_source"] is None
 
 
 def test_position_valid_at_origin_when_nic_nonzero():
@@ -77,13 +79,14 @@ def test_ground_speed_track_and_dimensions():
     assert result["airground_state"] == "ground"
     assert result["groundspeed"] == 50
     assert result["track"] == 271
-    assert result["track_type"] == "track"
+    assert result["heading"] is None
+    assert result["heading_type"] is None
     assert result["length"] == 85
     assert result["width"] == 45
     assert result["position_offset"] is True
     # Vertical rate is not defined on the ground -- those bits are dimensions instead.
     assert result["vertical_rate"] is None
-    assert result["vertical_rate_source"] is None
+    assert result["vr_source"] is None
 
 
 def test_supersonic_velocity_multiplier():
@@ -104,16 +107,37 @@ def test_supersonic_velocity_multiplier():
     assert result["track"] == 45  # equal N/S and E/W -> 45 degrees
 
 
-def test_ground_invalid_track_type_code():
+def test_ground_invalid_type_code():
     payload = _pack(
         18,
         [
             (96, 2, 2),  # airground_state = ground
             (99, 11, 51),  # groundspeed raw -> 50kt
-            (110, 11, 0b00_100000000),  # track type code 0 (invalid), magnitude bits irrelevant
+            (110, 11, 0b00_100000000),  # type code 0 (invalid), magnitude bits irrelevant
         ],
     )
     result = decode(payload, address_qualifier=0)
     assert result["groundspeed"] == 50
     assert result["track"] is None
-    assert result["track_type"] is None
+    assert result["heading"] is None
+    assert result["heading_type"] is None
+
+
+def test_ground_magnetic_heading():
+    # type code 2 (magnetic heading), value code 386 -> 271.40625 deg
+    raw_track = (2 << 9) | 386
+    payload = _pack(18, [(96, 2, 2), (110, 11, raw_track)])
+    result = decode(payload, address_qualifier=0)
+    assert result["track"] is None
+    assert result["heading"] == 271
+    assert result["heading_type"] == "magnetic"
+
+
+def test_ground_true_heading():
+    # type code 3 (true heading), value code 386 -> 271.40625 deg
+    raw_track = (3 << 9) | 386
+    payload = _pack(18, [(96, 2, 2), (110, 11, raw_track)])
+    result = decode(payload, address_qualifier=0)
+    assert result["track"] is None
+    assert result["heading"] == 271
+    assert result["heading_type"] == "true"
