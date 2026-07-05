@@ -95,15 +95,8 @@ long-frame ADS-B message: HDR + State Vector + Mode Status + AUX SV):
 `position_containment_radius_m`/`position_vpl_m` are `None` here because `nic=9` is only resolvable when
 `nic_supplement_a=True` — a real, expected gap in the underlying table, not a bug (see `_uncertainty.py`).
 
-Fields typed as one of our `IntEnum`s (see the data dictionary for the complete list and their values) still
-compare/hash equal to their plain-int value. Two things worth knowing:
-
-- Most enums have every raw value named; `payload_type`, `address_qualifier`, `category`, `emergency_state`,
-  and `sil_supplement` are the exception, falling back to the plain int for any unnamed raw value.
-- `airground_state` keeps subsonic/supersonic airborne as distinct members rather than collapsing them into
-  one `AIRBORNE` value — see `vertical_status` for a pre-collapsed `"airborne"`/`"on-ground"` view if you don't
-  need the distinction. `altitude_type`, `altitude_secondary_type`, and `vr_source` all share one
-  `AltitudeSource` enum (`BARO`/`GNSS`).
+Fields typed as one of pyModeS978's `IntEnum`s (see the data dictionary for the complete list, their values,
+and any per-field caveats) still compare/hash equal to their plain-int value.
 
 ## Error Handling
 
@@ -120,12 +113,13 @@ correlating a failure back to its input.
 
 ## Data dictionary
 
-Every field either library can return, alphabetical by field name. **pyModeS978 Field** is ours; **pyModeS
-Equivalent** is the matching field in pyModeS's 1090 `decode()` output. A ❌ in the pyModeS978 Field column means
-that data simply isn't available from a UAT frame; a ❌ in the pyModeS Equivalent column means the reverse --
-pyModeS has nothing comparable. pyModeS-only fields are inserted alphabetically as if pyModeS978 had a field of
-that same name, so the whole table reads as one merged, alphabetical list rather than "ours first, then
-theirs." Where a field's type is one of our `IntEnum`s, its possible values are listed. **Payload Types** is
+Every field either library can return, alphabetical by field name. **pyModeS978 Field** is the field pyModeS978
+returns; **pyModeS Equivalent** is the matching field in pyModeS's 1090 `decode()` output. A ❌ in the
+pyModeS978 Field column means that data simply isn't available from a UAT frame; a ❌ in the pyModeS Equivalent
+column means the reverse — pyModeS has nothing comparable. pyModeS-only fields are inserted alphabetically as
+if pyModeS978 had a field of that same name, so the whole table reads as one merged, alphabetical list rather
+than "pyModeS978's first, then pyModeS's." Where a field's type is one of pyModeS978's `IntEnum`s, its possible
+values are listed. **Payload Types** is
 which `payload_type` values a field's block is structurally present for (`—` for pyModeS-only fields, since
 they don't exist in `decode()`'s output at all); **Requirements** covers everything else — finer per-frame
 conditions like ground/airborne-only, or when a field resolves to `None` even within an applicable payload
@@ -170,7 +164,7 @@ Two recurring patterns, noted once here instead of in every row:
 | ❌ | `capability` | 3-bit capability field — transponder's Mode S capability level. | — | 1090 only, DF11. |
 | ❌ | `capability_class` | Raw capability class bitfield — the packed equivalent of `uat_in`/`es_in`/`tcas_operational`, exposed here as individually named booleans instead. | — | 1090 only, BDS 6,5 operational status report. |
 | ❌ | `capability_text` | Human-readable decode of `capability`. | — | 1090 only, DF11. |
-| `category` | `category` (bare `int`; ours is `EmitterCategory`) | Aircraft/vehicle emitter category. Values: `NO_INFORMATION`, `LIGHT`, `MEDIUM`, `MEDIUM_LARGE`, `MEDIUM_LARGE_HIGH_VORTEX`, `HEAVY`, `HIGHLY_MANEUVERABLE`, `ROTORCRAFT`, `RESERVED_8`, `GLIDER_SAILPLANE`, `LIGHTER_THAN_AIR`, `PARACHUTIST_SKYDIVER`, `ULTRALIGHT_HANGGLIDER_PARAGLIDER`, `RESERVED_13`, `UAV`, `SPACE_TRANSATMOSPHERIC`, `RESERVED_16`, `EMERGENCY_VEHICLE`, `SERVICE_VEHICLE`, `POINT_OBSTACLE`, `CLUSTER_OBSTACLE`, `LINE_OBSTACLE`, `RESERVED_22`–`RESERVED_39`. pyModeS exposes this as a bare `int`; we chose to name the values here for readability. | 1, 3 | — |
+| `category` | `category` (bare `int`; pyModeS978's is `EmitterCategory`) | Aircraft/vehicle emitter category. Values: `NO_INFORMATION`, `LIGHT`, `MEDIUM`, `MEDIUM_LARGE`, `MEDIUM_LARGE_HIGH_VORTEX`, `HEAVY`, `HIGHLY_MANEUVERABLE`, `ROTORCRAFT`, `RESERVED_8`, `GLIDER_SAILPLANE`, `LIGHTER_THAN_AIR`, `PARACHUTIST_SKYDIVER`, `ULTRALIGHT_HANGGLIDER_PARAGLIDER`, `RESERVED_13`, `UAV`, `SPACE_TRANSATMOSPHERIC`, `RESERVED_16`, `EMERGENCY_VEHICLE`, `SERVICE_VEHICLE`, `POINT_OBSTACLE`, `CLUSTER_OBSTACLE`, `LINE_OBSTACLE`, `RESERVED_22`–`RESERVED_39`. pyModeS exposes this as a bare `int`; pyModeS978 names the values here for readability. | 1, 3 | — |
 | ❌ | `common_usage_gicb_capability` | Whether the transponder reports common-usage GICB capability (BDS 1,7). | — | 1090 only, BDS 1,0. |
 | ❌ | `config` | Raw configuration byte. | — | 1090 only, BDS 1,0 data link capability. |
 | ❌ | `corrective` | Whether the active RA is corrective (requires a maneuver) vs. preventive. | — | 1090 only, BDS 3,0. |
@@ -184,7 +178,7 @@ Two recurring patterns, noted once here instead of in every row:
 | ❌ | `downlink_request` | Whether the transponder has more data queued to send. | — | 1090 only, DF4/5/20/21. |
 | ❌ | `downward_sense` | Whether the RA commands a downward sense. | — | 1090 only, BDS 3,0. |
 | ❌ | `dte_status` | Data Terminal Equipment status field. | — | 1090 only, BDS 1,0. |
-| `emergency_state` | `emergency_state` (bare `int`; ours is `Emergency`) | `Emergency` enum — emergency/priority status. Values: `NO_EMERGENCY`, `GENERAL`, `MEDICAL`, `MINIMUM_FUEL`, `NO_COMMUNICATIONS`, `UNLAWFUL_INTERFERENCE`, `DOWNED_AIRCRAFT`, `RESERVED_7`. | 1, 3 | — |
+| `emergency_state` | `emergency_state` (bare `int`; pyModeS978's is `Emergency`) | `Emergency` enum — emergency/priority status. Values: `NO_EMERGENCY`, `GENERAL`, `MEDICAL`, `MINIMUM_FUEL`, `NO_COMMUNICATIONS`, `UNLAWFUL_INTERFERENCE`, `DOWNED_AIRCRAFT`, `RESERVED_7`. | 1, 3 | — |
 | ❌ | `error` | Error message text, part of pyModeS's corrupt-input error envelope for batch/pipe decode modes. | — | 1090 only. |
 | `es_in` | ❌ (`capability_class` bitfield, see above) | Capability code — has a 1090ES receiver. | 1, 3 | — |
 | ❌ | `figure_of_merit` | Confidence/quality indicator for the met report. | — | 1090 only, BDS 4,4. |
@@ -221,8 +215,8 @@ Two recurring patterns, noted once here instead of in every row:
 | `nac_v` | `nac_v` | Navigation Accuracy Category for Velocity, 3-bit raw (0–7; only 0–4 defined). Resolves `velocity_accuracy_hfom_ms`/`velocity_accuracy_vfom_ms`. | 1, 3 | — |
 | `nic` | ❌ (pyModeS resolves NIC internally from typecode + supplement bits for its own uncertainty functions; the resolved number itself isn't part of its `decode()` output) | Navigation Integrity Category, 4-bit raw (0–15) — confidence in the position fix. Combines with `nic_supplement_a` to resolve `position_containment_radius_m`/`position_vpl_m`. | 0–10 | — |
 | ❌ | `nic_b` | The single "NIC supplement B" bit carried in the raw airborne position message. | — | 1090 only, BDS 0,5. |
-| `nic_baro` | `nic_baro` (bare `int`; ours is `bool`) | Whether the barometric altitude has been cross-checked against another source. | 1, 3 | — |
-| `nic_supplement_a` | `nic_supplement_a` (bare `int`; ours is `bool`) | The one NIC supplement bit UAT has (1090 has two). | 1, 3 | — |
+| `nic_baro` | `nic_baro` (bare `int`; pyModeS978's is `bool`) | Whether the barometric altitude has been cross-checked against another source. | 1, 3 | — |
+| `nic_supplement_a` | `nic_supplement_a` (bare `int`; pyModeS978's is `bool`) | The one NIC supplement bit UAT has (1090 has two). | 1, 3 | — |
 | ❌ | `no_above` | Whether the RA is a "do not climb above" restriction. | — | 1090 only, BDS 3,0. |
 | ❌ | `no_below` | Whether the RA is a "do not descend below" restriction. | — | 1090 only, BDS 3,0. |
 | ❌ | `no_left` | Whether the RA is a "do not turn left" restriction (rare horizontal RA variant). | — | 1090 only, BDS 3,0. |
@@ -253,7 +247,7 @@ Two recurring patterns, noted once here instead of in every row:
 | `sil` | `sil` | Source Integrity Level, 2-bit raw (0–3) — probability the reported position exceeds the NIC containment radius without alerting. | 1, 3 | — |
 | `sil_probability_horizontal` | ❌ (see above) | Probability `position_containment_radius_m` is exceeded without alerting, from `sil`. Time base given by `sil_supplement`. | 1, 3 | — |
 | `sil_probability_vertical` | ❌ (see above) | Probability `position_vpl_m` is exceeded without alerting, from `sil`. Same time-base caveat. | 1, 3 | — |
-| `sil_supplement` | `sil_supplement` (bare `int`; ours is `SILSupplement`) | `PER_HOUR` or `PER_SAMPLE` — the time base `sil`'s probabilities apply to, not a different probability table. | 1, 3 | — |
+| `sil_supplement` | `sil_supplement` (bare `int`; pyModeS978's is `SILSupplement`) | `PER_HOUR` or `PER_SAMPLE` — the time base `sil`'s probabilities apply to, not a different probability table. | 1, 3 | — |
 | `single_antenna` | ❌ | Whether the transmitter uses a single antenna (vs. antenna diversity). | 1, 3 | — |
 | `squawk` | `squawk` | Mode 3/A squawk code. A CSID flag in the same raw bits as `callsign` picks whether this field is a callsign or a squawk — UAT has no DF 5/21 equivalent, so this is the *only* source of squawk. | 1, 3 | Mutually exclusive with `callsign`. |
 | ❌ | `squitter_capability` | Extended squitter capability flag. | — | 1090 only, BDS 1,0. |
@@ -291,7 +285,7 @@ Two recurring patterns, noted once here instead of in every row:
 | `vertical_rate` | `vertical_rate` | Feet/min, signed, from the 11-bit raw vertical rate code. | 0–10 | Airborne only — `None` on the ground (those bits hold aircraft dimensions instead). |
 | `vertical_status` | `vertical_status` | `"airborne"` or `"on-ground"`, matching pyModeS's exact strings — derived from `airground_state` (both `AIRBORNE_SUBSONIC`/`AIRBORNE_SUPERSONIC` map to `"airborne"`). Derived convenience field, not a new bit read. | 0–10 | `None` for `RESERVED` airground state (no pyModeS equivalent for that state). |
 | ❌ | `vnav_mode` | Whether VNAV mode is engaged. | — | 1090 only, BDS 4,0. |
-| `vr_source` | `vr_source` (bare `str`; ours is `AltitudeSource`) | `BARO` or `GNSS` — which kind of altitude `vertical_rate` is derived from. Same values as pyModeS's own `"BARO"`/`"GNSS"` strings, matched exactly. | 0–10 | Airborne only. |
+| `vr_source` | `vr_source` (bare `str`; pyModeS978's is `AltitudeSource`) | `BARO` or `GNSS` — which kind of altitude `vertical_rate` is derived from. Same values as pyModeS's own `"BARO"`/`"GNSS"` strings, matched exactly. | 0–10 | Airborne only. |
 | ❌ | `wake_vortex` | Human-readable wake turbulence category text, derived from `category` + typecode. | — | 1090 only, BDS 0,8. |
 | `width` | ❌ | Aircraft width, meters, from the width/length code table. | 0–10 | Ground only. |
 | ❌ | `wind_direction` | Wind direction, degrees. | — | 1090 only, BDS 4,4. |
