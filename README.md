@@ -113,17 +113,20 @@ correlating a failure back to its input.
 
 ## Data dictionary
 
-Every field either library can return, alphabetical by field name. **pyModeS978 Field** is the field pyModeS978
-returns; **pyModeS Equivalent** is the matching field in pyModeS's 1090 `decode()` output. A ❌ in the
-pyModeS978 Field column means that data simply isn't available from a UAT frame; a ❌ in the pyModeS Equivalent
-column means the reverse — pyModeS has nothing comparable. pyModeS-only fields are inserted alphabetically as
-if pyModeS978 had a field of that same name, so the whole table reads as one merged, alphabetical list rather
-than "pyModeS978's first, then pyModeS's." Where a field's type is one of pyModeS978's `IntEnum`s, its possible
-values are listed. **Payload Types** is
-which `payload_type` values a field's block is structurally present for (`—` for pyModeS-only fields, since
-they don't exist in `decode()`'s output at all); **Notes** covers everything else — finer per-frame
-conditions like ground/airborne-only, or when a field resolves to `None` even within an applicable payload
-type.
+Every field either library can return, alphabetical by field name:
+
+- **pyModeS978 Field** — the field pyModeS978 returns. `❌` means that data simply isn't available from a UAT
+  frame.
+- **pyModeS Equivalent** — the matching field in pyModeS's 1090 `decode()` output. `❌` means the reverse —
+  pyModeS has nothing comparable.
+- **Payload Types** — which `payload_type` values a field's block is structurally present for. `—` for
+  pyModeS-only fields, since they don't exist in `decode()`'s output at all.
+- **Notes** — everything else: finer per-frame conditions like ground/airborne-only, or when a field resolves
+  to `None` even within an applicable payload type.
+
+pyModeS-only fields are inserted alphabetically as if pyModeS978 had a field of that same name, so the whole
+table reads as one merged, alphabetical list rather than "pyModeS978's first, then pyModeS's." Where a field's
+type is one of pyModeS978's `IntEnum`s, its possible values are listed.
 
 Two recurring patterns, noted once here instead of in every row:
 
