@@ -14,6 +14,7 @@ pip install pyModeS978
 ```python
 import pyModeS978
 
+raw = "-08A042FF27EF018BF51C59C9079A0C40EB1019073F5D440B8EA5E280005F30000000"
 result = pyModeS978.decode(raw)   # dict | None
 ```
 
