@@ -124,9 +124,9 @@ The table below lists every field either library can return, alphabetical by fie
 - **Notes** — everything else: finer per-frame conditions like ground/airborne-only, or when a field resolves
   to `None` even within an applicable payload type.
 
-pyModeS-only fields are inserted alphabetically as if pyModeS978 had a field of that same name, so the whole
-table reads as one merged, alphabetical list rather than "pyModeS978's first, then pyModeS's." Where a field's
-type is one of pyModeS978's `IntEnum`s, its possible values are listed.
+In the table below, pyModeS-only fields are inserted alphabetically as if pyModeS978 had a field of that same
+name, so the whole table reads as one merged, alphabetical list rather than "pyModeS978's first, then
+pyModeS's." Where a field's type is one of pyModeS978's `IntEnum`s, its possible values are listed.
 
 Two recurring patterns, noted once here instead of in every row:
 
