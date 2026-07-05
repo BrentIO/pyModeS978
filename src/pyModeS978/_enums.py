@@ -63,6 +63,23 @@ class SILSupplement(IntEnum):
     PER_SAMPLE = 1
 
 
+class AirgroundState(IntEnum):
+    AIRBORNE_SUBSONIC = 0
+    AIRBORNE_SUPERSONIC = 1
+    ON_GROUND = 2
+    RESERVED = 3
+
+
+class AltitudeSource(IntEnum):
+    BARO = 0
+    GNSS = 1
+
+
+class HeadingType(IntEnum):
+    MAGNETIC = 2
+    TRUE = 3
+
+
 def coerce(enum_cls: type[IntEnum], value: int) -> IntEnum | int:
     """`enum_cls(value)`, but falls back to the plain int for values with no named member."""
     try:

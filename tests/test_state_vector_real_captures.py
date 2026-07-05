@@ -3,6 +3,7 @@ from pathlib import Path
 
 import pytest
 
+from pyModeS978._enums import AirgroundState
 from pyModeS978._frame import parse
 from pyModeS978._state_vector import decode
 
@@ -27,4 +28,4 @@ def test_real_capture_state_vector_decodes_without_crashing(record):
         assert 0 <= result["groundspeed"] < 4000
     if result["track"] is not None:
         assert 0 <= result["track"] < 360
-    assert result["airground_state"] in {"airborne", "ground", "reserved"}
+    assert isinstance(result["airground_state"], AirgroundState)

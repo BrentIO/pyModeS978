@@ -8,6 +8,8 @@ is an independent encoder, and round-tripping it through pyModeS978.decode()
 is itself part of what tests in this suite verify.
 """
 
+from pyModeS978._enums import AltitudeSource
+
 _BASE40_ALPHABET = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ  .."
 
 
@@ -61,7 +63,7 @@ def build_frame(
     longitude: float | None = None,
     nic: int = 0,
     altitude: int | None = None,
-    altitude_type: str = "BARO",
+    altitude_type: AltitudeSource = AltitudeSource.BARO,
     airground_state: int = 0,  # 0=airborne subsonic, 1=supersonic, 2=ground, 3=reserved
     ns_velocity: int | None = None,
     ew_velocity: int | None = None,
@@ -69,7 +71,7 @@ def build_frame(
     track: float | None = None,
     track_type_code: int = 1,  # 1=track, 2=magnetic_heading, 3=true_heading
     vertical_rate: int | None = None,
-    vr_source: str = "GNSS",
+    vr_source: AltitudeSource = AltitudeSource.GNSS,
     length_code: int = 0,
     width_code: int = 0,
     position_offset: bool = False,
@@ -110,7 +112,7 @@ def build_frame(
         (8, 24, icao),
         (32, 23, _encode_lat(latitude) if latitude is not None else 0),
         (55, 24, _encode_lon(longitude) if longitude is not None else 0),
-        (79, 1, 1 if altitude_type == "GNSS" else 0),
+        (79, 1, 1 if altitude_type == AltitudeSource.GNSS else 0),
         (80, 12, _encode_altitude(altitude)),
         (92, 4, nic),
         (96, 2, airground_state),
@@ -124,7 +126,7 @@ def build_frame(
             raw_vvel = (abs(vertical_rate) // 64 + 1) & 0x1FF
             if vertical_rate < 0:
                 raw_vvel |= 0x200
-            if vr_source == "BARO":
+            if vr_source == AltitudeSource.BARO:
                 raw_vvel |= 0x400
             fields.append((121, 11, raw_vvel))
     elif airground_state == 2:

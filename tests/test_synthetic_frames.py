@@ -4,7 +4,7 @@ import pytest
 from synth import build_frame
 
 import pyModeS978
-from pyModeS978._enums import EmitterCategory
+from pyModeS978._enums import AirgroundState, AltitudeSource, EmitterCategory, HeadingType
 
 
 def test_position_unavailable_when_nic_zero():
@@ -36,10 +36,10 @@ def test_altitude_unavailable():
 
 
 def test_altitude_available():
-    frame = build_frame(payload_type=0, altitude=35000, altitude_type="GNSS")
+    frame = build_frame(payload_type=0, altitude=35000, altitude_type=AltitudeSource.GNSS)
     result = pyModeS978.decode(frame.hex())
     assert result["altitude"] == 35000
-    assert result["altitude_type"] == "GNSS"
+    assert result["altitude_type"] == AltitudeSource.GNSS
 
 
 def test_airborne_velocity_and_vertical_rate():
@@ -49,16 +49,16 @@ def test_airborne_velocity_and_vertical_rate():
         ns_velocity=100,
         ew_velocity=-50,
         vertical_rate=-640,
-        vr_source="BARO",
+        vr_source=AltitudeSource.BARO,
     )
     result = pyModeS978.decode(frame.hex())
-    assert result["airground_state"] == "airborne"
+    assert result["airground_state"] == AirgroundState.AIRBORNE_SUBSONIC
     assert result["groundspeed"] == round(math.sqrt(100**2 + 50**2))
     assert result["track"] == round((360 + 90 - math.degrees(math.atan2(100, -50))) % 360, 1)
     assert result["heading"] is None
     assert result["heading_type"] is None
     assert result["vertical_rate"] == -640
-    assert result["vr_source"] == "BARO"
+    assert result["vr_source"] == AltitudeSource.BARO
 
 
 def test_supersonic_velocity_multiplier():
@@ -77,7 +77,7 @@ def test_ground_velocity_and_track():
         track_type_code=1,
     )
     result = pyModeS978.decode(frame.hex())
-    assert result["airground_state"] == "ground"
+    assert result["airground_state"] == AirgroundState.ON_GROUND
     assert result["groundspeed"] == 50
     assert result["track"] == 271.4
     assert result["heading"] is None
@@ -95,7 +95,7 @@ def test_ground_magnetic_heading():
     result = pyModeS978.decode(frame.hex())
     assert result["track"] is None
     assert result["heading"] == 271.4
-    assert result["heading_type"] == "magnetic"
+    assert result["heading_type"] == HeadingType.MAGNETIC
 
 
 def test_ground_dimensions():
@@ -115,7 +115,7 @@ def test_ground_dimensions():
 def test_reserved_airground_state_has_no_velocity_or_dimensions():
     frame = build_frame(payload_type=0, airground_state=3)
     result = pyModeS978.decode(frame.hex())
-    assert result["airground_state"] == "reserved"
+    assert result["airground_state"] == AirgroundState.RESERVED
     assert result["groundspeed"] is None
     assert result["track"] is None
     assert result["vertical_rate"] is None
@@ -160,10 +160,10 @@ def test_blank_mode_status_field():
 
 
 def test_aux_sv_present_with_opposite_type():
-    frame = build_frame(payload_type=1, altitude_type="BARO", altitude_secondary=5000)
+    frame = build_frame(payload_type=1, altitude_type=AltitudeSource.BARO, altitude_secondary=5000)
     result = pyModeS978.decode(frame.hex())
     assert result["altitude_secondary"] == 5000
-    assert result["altitude_secondary_type"] == "GNSS"
+    assert result["altitude_secondary_type"] == AltitudeSource.GNSS
 
 
 def test_aux_sv_absent_for_sv_only_type():

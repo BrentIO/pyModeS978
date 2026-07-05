@@ -1,14 +1,13 @@
 import math
 
 from ._bits import read_uint
-from ._enums import AddressQualifier
+from ._enums import AddressQualifier, AirgroundState, AltitudeSource, HeadingType
 
 # ADS-B aircraft length/width code table (DO-260/DO-282), meters.
 _DIMENSIONS_WIDTHS_M = [
     11.5, 23, 28.5, 34, 33, 38, 39.5, 45, 45, 52, 59.5, 67, 72.5, 80, 80, 90,
 ]
 
-_AIRGROUND_STRINGS = {0: "airborne", 1: "airborne", 2: "ground", 3: "reserved"}
 _TISB_ADDRESS_QUALIFIERS = {2, 3}
 
 FIELDS = (
@@ -50,10 +49,10 @@ def decode(payload: bytes, address_qualifier: AddressQualifier | int) -> dict:
     altitude = altitude_type = None
     if raw_alt != 0:
         altitude = (raw_alt - 1) * 25 - 1000
-        altitude_type = "GNSS" if read_uint(payload, 79, 1) else "BARO"
+        altitude_type = AltitudeSource.GNSS if read_uint(payload, 79, 1) else AltitudeSource.BARO
 
     raw_airground = read_uint(payload, 96, 2)
-    airground_state = _AIRGROUND_STRINGS[raw_airground]
+    airground_state = AirgroundState(raw_airground)
 
     groundspeed = track = heading = heading_type = None
     vertical_rate = vr_source = None
@@ -133,7 +132,7 @@ def _decode_ground_velocity(payload: bytes):
 
     track = value if type_code == 1 else None
     heading = value if type_code in (2, 3) else None
-    heading_type = {2: "magnetic", 3: "true"}.get(type_code)
+    heading_type = {2: HeadingType.MAGNETIC, 3: HeadingType.TRUE}.get(type_code)
 
     return groundspeed, track, heading, heading_type
 
@@ -146,7 +145,7 @@ def _decode_vertical_rate(payload: bytes):
     value = (magnitude - 1) * 64
     if raw & 0x200:
         value = -value
-    source = "BARO" if raw & 0x400 else "GNSS"
+    source = AltitudeSource.BARO if raw & 0x400 else AltitudeSource.GNSS
     return value, source
 
 
