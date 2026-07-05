@@ -45,4 +45,4 @@ def decode(raw: str) -> dict | None:
     else:
         result.update(dict.fromkeys(_aux_sv.FIELDS))
 
-    return result
+    return dict(sorted(result.items()))
