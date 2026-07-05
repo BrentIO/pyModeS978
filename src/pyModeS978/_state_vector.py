@@ -17,6 +17,7 @@ FIELDS = (
     "altitude_type",
     "nic",
     "airground_state",
+    "vertical_status",
     "groundspeed",
     "track",
     "heading",
@@ -54,6 +55,12 @@ def decode(payload: bytes, address_qualifier: AddressQualifier | int) -> dict:
 
     raw_airground = read_uint(payload, 96, 2)
     airground_state = AirgroundState(raw_airground)
+    if airground_state in (AirgroundState.AIRBORNE_SUBSONIC, AirgroundState.AIRBORNE_SUPERSONIC):
+        vertical_status = "airborne"
+    elif airground_state == AirgroundState.ON_GROUND:
+        vertical_status = "on-ground"
+    else:
+        vertical_status = None
 
     groundspeed = track = heading = heading_type = None
     vertical_rate = vr_source = None
@@ -80,6 +87,7 @@ def decode(payload: bytes, address_qualifier: AddressQualifier | int) -> dict:
         "altitude_type": altitude_type,
         "nic": nic,
         "airground_state": airground_state,
+        "vertical_status": vertical_status,
         "groundspeed": groundspeed if groundspeed is None else round(groundspeed),
         "track": track if track is None else round(track, 1),
         "heading": heading if heading is None else round(heading, 1),
