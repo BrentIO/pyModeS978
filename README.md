@@ -125,8 +125,8 @@ The table below lists every field either library can return, alphabetical by fie
   to `None` even within an applicable payload type.
 
 In the table below, pyModeS-only fields are inserted alphabetically as if pyModeS978 had a field of that same
-name, so the whole table reads as one merged, alphabetical list rather than "pyModeS978's first, then
-pyModeS's." Where a field's type is one of pyModeS978's `IntEnum`s, its possible values are listed.
+name, so the whole table reads as one merged, alphabetical list. Where a field's type is one of pyModeS978's
+`IntEnum`s, its possible values are listed.
 
 Two recurring patterns, noted once here instead of in every row:
 
