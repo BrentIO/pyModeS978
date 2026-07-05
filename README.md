@@ -28,11 +28,11 @@ long-frame ADS-B message: HDR + State Vector + Mode Status + AUX SV):
 ```python
 {
     'address_qualifier': AddressQualifier.ADSB_ICAO,
-    'airground_state': 'airborne',
+    'airground_state': AirgroundState.AIRBORNE_SUBSONIC,
     'altitude': 34875,
     'altitude_secondary': 37050,
-    'altitude_secondary_type': 'GNSS',
-    'altitude_type': 'BARO',
+    'altitude_secondary_type': AltitudeSource.GNSS,
+    'altitude_type': AltitudeSource.BARO,
     'atc_services': False,
     'callsign': 'N116FE',
     'category': EmitterCategory.MEDIUM,
@@ -77,7 +77,7 @@ long-frame ADS-B message: HDR + State Vector + Mode Status + AUX SV):
     'velocity_accuracy_vfom_ms': 4.5,
     'version': 2,
     'vertical_rate': 832,
-    'vr_source': 'BARO',
+    'vr_source': AltitudeSource.BARO,
     'width': None,
 }
 ```
@@ -85,9 +85,14 @@ long-frame ADS-B message: HDR + State Vector + Mode Status + AUX SV):
 `position_containment_radius_m`/`position_vpl_m` are `None` here because `nic=9` is only resolvable when
 `nic_supplement_a=True` — a real, expected gap in the underlying table, not a bug (see `_uncertainty.py`).
 
-`payload_type`, `address_qualifier`, `category`, `emergency`, and `sil_supplement` are `IntEnum`s (still
-compare/hash equal to their plain-int value) with a fallback to the plain int for any raw value that isn't a
-named member.
+`payload_type`, `address_qualifier`, `category`, `emergency`, `sil_supplement`, `airground_state`,
+`altitude_type`, `altitude_secondary_type`, `vr_source`, and `heading_type` are all `IntEnum`s (still
+compare/hash equal to their plain-int value). `payload_type`/`address_qualifier`/`category`/`emergency`/
+`sil_supplement` fall back to the plain int for any raw value with no named member; the other five have every
+raw value named, so no fallback applies. `airground_state` does not collapse subsonic/supersonic airborne into
+one value -- `AirgroundState.AIRBORNE_SUBSONIC` and `AirgroundState.AIRBORNE_SUPERSONIC` are distinct members,
+so collapse them yourself if you don't care about the distinction. `altitude_type`, `altitude_secondary_type`,
+and `vr_source` all share the same `AltitudeSource` enum (`BARO`/`GNSS`).
 
 ## Versioning & releases
 
