@@ -1,7 +1,10 @@
 # pyModeS978
 
-A pure-Python decoder for UAT (978 MHz) frames — the sibling protocol to 1090 MHz ADS-B. `pyModeS` has no UAT
-support and no Python UAT decoder exists elsewhere, so this library implements the frame layout from scratch.
+A pure-Python decoder for UAT (978 MHz) frames — the sibling protocol to 1090 MHz ADS-B. This project builds
+on the excellent work of [`pyModeS`](https://github.com/junzis/pyModeS), the Python library this one takes its
+name, API shape, and field-naming conventions from. pyModeS has no UAT support and no Python UAT decoder
+exists elsewhere, so this library implements the frame layout from scratch, aiming to feel as familiar as
+possible to anyone already using pyModeS.
 
 Wherever possible, the fields with like-for-like meaning have been mapped and should be drop-in replacements
 in the most common instances.
