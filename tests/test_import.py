@@ -1,5 +1,5 @@
 import pyModeS978
-from pyModeS978 import _aux_sv, _mode_status, _state_vector
+from pyModeS978 import _aux_sv, _mode_status, _state_vector, _uncertainty
 
 
 def test_decode_invalid_input_returns_none():
@@ -15,6 +15,7 @@ def test_decode_returns_all_fields():
         | set(_state_vector.FIELDS)
         | set(_mode_status.FIELDS)
         | set(_aux_sv.FIELDS)
+        | set(_uncertainty.FIELDS)
     )
     assert set(result.keys()) == expected_keys
     assert result["icao"] == "000000"

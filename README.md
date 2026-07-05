@@ -75,8 +75,19 @@ example output (a long-frame ADS-B message: HDR + State Vector + Mode Status + A
     'atc_services': False,
     'altitude_secondary': 37050,
     'altitude_secondary_type': 'geo',
+    'position_accuracy_epu_m': 10,
+    'position_accuracy_vepu_m': 15,
+    'velocity_accuracy_hfom_ms': 3,
+    'velocity_accuracy_vfom_ms': 4.5,
+    'position_containment_radius_m': None,
+    'position_vpl_m': None,
+    'sil_probability_horizontal': 1e-07,
+    'sil_probability_vertical': 2e-07,
 }
 ```
+
+`position_containment_radius_m`/`position_vpl_m` are `None` here because `nic=9` is only resolvable when
+`nic_supplement=True` — a real, expected gap in the underlying table, not a bug (see `_uncertainty.py`).
 
 `payload_type`, `address_qualifier`, `emitter_category`, `emergency`, and `sil_supplement` are `IntEnum`s (still
 compare/hash equal to their plain-int value) with a fallback to the plain int for any raw value that isn't a

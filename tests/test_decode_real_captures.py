@@ -4,7 +4,7 @@ from pathlib import Path
 import pytest
 
 import pyModeS978
-from pyModeS978 import _aux_sv, _mode_status, _state_vector
+from pyModeS978 import _aux_sv, _mode_status, _state_vector, _uncertainty
 
 _FIXTURE = Path(__file__).parent / "fixtures" / "uat-example.ndjson"
 _RECORDS = [json.loads(line) for line in _FIXTURE.read_text().splitlines() if line.strip()]
@@ -14,6 +14,7 @@ _EXPECTED_KEYS = (
     | set(_state_vector.FIELDS)
     | set(_mode_status.FIELDS)
     | set(_aux_sv.FIELDS)
+    | set(_uncertainty.FIELDS)
 )
 
 
