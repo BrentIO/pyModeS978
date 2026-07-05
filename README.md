@@ -101,8 +101,9 @@ compare/hash equal to their plain-int value. Two things worth knowing:
 - Most enums have every raw value named; `payload_type`, `address_qualifier`, `category`, `emergency_state`,
   and `sil_supplement` are the exception, falling back to the plain int for any unnamed raw value.
 - `airground_state` keeps subsonic/supersonic airborne as distinct members rather than collapsing them into
-  one `AIRBORNE` value — fold them together yourself if you don't need the distinction. `altitude_type`,
-  `altitude_secondary_type`, and `vr_source` all share one `AltitudeSource` enum (`BARO`/`GNSS`).
+  one `AIRBORNE` value — see `vertical_status` for a pre-collapsed `"airborne"`/`"on-ground"` view if you don't
+  need the distinction. `altitude_type`, `altitude_secondary_type`, and `vr_source` all share one
+  `AltitudeSource` enum (`BARO`/`GNSS`).
 
 ## Error Handling
 
