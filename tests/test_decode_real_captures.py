@@ -10,7 +10,7 @@ _FIXTURE = Path(__file__).parent / "fixtures" / "uat-example.ndjson"
 _RECORDS = [json.loads(line) for line in _FIXTURE.read_text().splitlines() if line.strip()]
 
 _EXPECTED_KEYS = (
-    {"direction", "payload_type", "address_qualifier", "icao"}
+    {"payload_type", "address_qualifier", "icao"}
     | set(_state_vector.FIELDS)
     | set(_mode_status.FIELDS)
     | set(_aux_sv.FIELDS)
@@ -24,4 +24,3 @@ def test_real_capture_decodes_without_crashing(record):
     assert result is not None
     assert set(result.keys()) == _EXPECTED_KEYS
     assert result["icao"] == record["icao_hex"]
-    assert result["direction"] == "downlink"

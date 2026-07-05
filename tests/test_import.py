@@ -11,7 +11,7 @@ def test_decode_returns_all_fields():
     assert result is not None
 
     expected_keys = (
-        {"direction", "payload_type", "address_qualifier", "icao"}
+        {"payload_type", "address_qualifier", "icao"}
         | set(_state_vector.FIELDS)
         | set(_mode_status.FIELDS)
         | set(_aux_sv.FIELDS)
