@@ -106,14 +106,18 @@ one value -- `AirgroundState.AIRBORNE_SUBSONIC` and `AirgroundState.AIRBORNE_SUP
 so collapse them yourself if you don't care about the distinction. `altitude_type`, `altitude_secondary_type`,
 and `vr_source` all share the same `AltitudeSource` enum (`BARO`/`GNSS`).
 
-## Errors
+## Error Handling
 
-Malformed input raises instead of returning `None`: `InvalidHexError` (non-hex characters, or an odd number of
-hex characters), `InvalidLengthError` (not 18, 34, or 432 bytes), or `DirectionMismatchError` (the `-`/`+`
-prefix disagrees with the direction implied by the byte length). All three subclass `DecodeError`, itself a
-`ValueError` subclass, so `except ValueError:` catches any of them. Every one of them carries the original
-`raw` input you passed to `decode()` as `.raw`, unmodified — useful for correlating a failure back to its
-source record.
+Malformed input to `decode()` raises one of three `DecodeError` subclasses, rather than returning `None` --
+`None` is reserved for uplink frames (see [Usage](#usage)). `DecodeError` itself subclasses `ValueError`, so
+`except ValueError:` catches any of them:
+
+- `InvalidHexError`: `raw` contains non-hex characters, or an odd number of hex characters.
+- `InvalidLengthError`: the decoded payload isn't 18, 34, or 432 bytes.
+- `DirectionMismatchError`: the `-`/`+` prefix disagrees with the direction implied by the byte length.
+
+Every one of them carries the original `raw` input you passed to `decode()` as `.raw`, unmodified — useful for
+correlating a failure back to its source record.
 
 ## Data dictionary
 
