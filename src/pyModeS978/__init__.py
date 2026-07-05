@@ -1,6 +1,5 @@
 from . import _aux_sv, _frame, _mode_status, _state_vector, _uncertainty
-
-__version__ = "9999.99.99"
+from ._version import __version__ as __version__
 
 _SV_TYPES = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10}
 _MS_TYPES = {1, 3}

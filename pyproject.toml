@@ -1,10 +1,10 @@
 [build-system]
-requires = ["hatchling"]
+requires = ["hatchling", "hatch-vcs"]
 build-backend = "hatchling.build"
 
 [project]
 name = "pyModeS978"
-version = "9999.99.99"
+dynamic = ["version"]
 description = "Pure-Python decoder for UAT (978 MHz) frames"
 readme = "README.md"
 license = "MIT"
@@ -20,6 +20,12 @@ dev = ["pytest", "ruff"]
 Homepage = "https://github.com/BrentIO/pyModeS978"
 Repository = "https://github.com/BrentIO/pyModeS978"
 Issues = "https://github.com/BrentIO/pyModeS978/issues"
+
+[tool.hatch.version]
+source = "vcs"
+
+[tool.hatch.build.hooks.vcs]
+version-file = "src/pyModeS978/_version.py"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/pyModeS978"]
