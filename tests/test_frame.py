@@ -1,4 +1,7 @@
+import pytest
+
 from pyModeS978._enums import AddressQualifier, PayloadType
+from pyModeS978._errors import DirectionMismatchError, InvalidHexError, InvalidLengthError
 from pyModeS978._frame import ParsedFrame, parse
 
 # payload_type=1 (00001), address_qualifier=0 (000) -> byte0 = 0000_1000 = 0x08
@@ -68,25 +71,40 @@ def test_uplink_with_prefix_returns_none():
     assert parse("+" + _UPLINK) is None
 
 
-def test_mismatched_prefix_and_length_returns_none():
+def test_mismatched_prefix_and_length_raises():
     # "-" (downlink) prefix on a 432-byte uplink-length payload is contradictory
-    assert parse("-" + _UPLINK) is None
+    with pytest.raises(DirectionMismatchError) as exc_info:
+        parse("-" + _UPLINK)
+    assert exc_info.value.asserted == "downlink"
+    assert exc_info.value.actual == "uplink"
+
     # "+" (uplink) prefix on a valid downlink-length payload is contradictory
-    assert parse("+" + _SHORT_DOWNLINK) is None
+    with pytest.raises(DirectionMismatchError) as exc_info:
+        parse("+" + _SHORT_DOWNLINK)
+    assert exc_info.value.asserted == "uplink"
+    assert exc_info.value.actual == "downlink"
 
 
-def test_invalid_length_returns_none():
-    assert parse("00" * 20) is None  # not 18, 34, or 432 bytes
+def test_invalid_length_raises():
+    with pytest.raises(InvalidLengthError) as exc_info:
+        parse("00" * 20)  # not 18, 34, or 432 bytes
+    assert exc_info.value.actual == 20
+    assert exc_info.value.expected == (18, 34, 432)
 
 
-def test_non_hex_characters_returns_none():
-    assert parse("ZZ" + _SHORT_DOWNLINK[2:]) is None
+def test_non_hex_characters_raises():
+    with pytest.raises(InvalidHexError) as exc_info:
+        parse("ZZ" + _SHORT_DOWNLINK[2:])
+    assert exc_info.value.raw == "ZZ" + _SHORT_DOWNLINK[2:]
 
 
-def test_odd_length_hex_returns_none():
-    assert parse(_SHORT_DOWNLINK[:-1]) is None
+def test_odd_length_hex_raises():
+    with pytest.raises(InvalidHexError):
+        parse(_SHORT_DOWNLINK[:-1])
 
 
-def test_empty_string_returns_none():
-    assert parse("") is None
-    assert parse("-") is None
+def test_empty_string_raises():
+    with pytest.raises(InvalidHexError):
+        parse("")
+    with pytest.raises(InvalidHexError):
+        parse("-")

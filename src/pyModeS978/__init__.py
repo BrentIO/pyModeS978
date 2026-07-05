@@ -1,5 +1,9 @@
 from . import _aux_sv, _frame, _mode_status, _state_vector, _uncertainty
 from ._enums import AltitudeSource
+from ._errors import DecodeError as DecodeError
+from ._errors import DirectionMismatchError as DirectionMismatchError
+from ._errors import InvalidHexError as InvalidHexError
+from ._errors import InvalidLengthError as InvalidLengthError
 from ._version import __version__ as __version__
 
 _SV_TYPES = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10}
@@ -8,6 +12,12 @@ _AUXSV_TYPES = {1, 2, 5, 6}
 
 
 def decode(raw: str) -> dict | None:
+    """Decode a raw UAT frame.
+
+    Returns `None` for uplink frames (FIS-B weather/NOTAM, no traffic data) --
+    not an error. Raises `DecodeError` (or a subclass: `InvalidHexError`,
+    `InvalidLengthError`, `DirectionMismatchError`) for malformed input.
+    """
     frame = _frame.parse(raw)
     if frame is None:
         return None

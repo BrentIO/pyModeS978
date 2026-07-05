@@ -1,9 +1,12 @@
+import pytest
+
 import pyModeS978
 from pyModeS978 import _aux_sv, _mode_status, _state_vector, _uncertainty
 
 
-def test_decode_invalid_input_returns_none():
-    assert pyModeS978.decode("not valid hex") is None
+def test_decode_invalid_input_raises():
+    with pytest.raises(pyModeS978.InvalidHexError):
+        pyModeS978.decode("not valid hex")
 
 
 def test_decode_returns_all_fields():

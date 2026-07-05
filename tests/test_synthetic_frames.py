@@ -5,6 +5,7 @@ from synth import build_frame
 
 import pyModeS978
 from pyModeS978._enums import AirgroundState, AltitudeSource, EmitterCategory, HeadingType
+from pyModeS978._errors import InvalidHexError
 
 
 def test_position_unavailable_when_nic_zero():
@@ -230,5 +231,6 @@ def test_uplink_returns_none():
     assert pyModeS978.decode("+" + "00" * 432) is None
 
 
-def test_malformed_input_returns_none():
-    assert pyModeS978.decode("not valid hex") is None
+def test_malformed_input_raises():
+    with pytest.raises(InvalidHexError):
+        pyModeS978.decode("not valid hex")

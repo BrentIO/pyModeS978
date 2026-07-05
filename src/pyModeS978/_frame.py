@@ -3,6 +3,7 @@ from dataclasses import dataclass
 
 from ._bits import read_uint
 from ._enums import AddressQualifier, PayloadType, coerce
+from ._errors import DirectionMismatchError, InvalidHexError, InvalidLengthError
 
 _DOWNLINK_LENGTHS = {18, 34}
 _UPLINK_LENGTH = 432
@@ -31,7 +32,7 @@ def parse(raw: str) -> ParsedFrame | None:
         raw = raw[1:]
 
     if not raw or len(raw) % 2 != 0 or not _HEX_RE.match(raw):
-        return None
+        raise InvalidHexError(raw)
 
     payload = bytes.fromhex(raw)
     length = len(payload)
@@ -41,10 +42,10 @@ def parse(raw: str) -> ParsedFrame | None:
     elif length == _UPLINK_LENGTH:
         direction = "uplink"
     else:
-        return None
+        raise InvalidLengthError(actual=length)
 
     if asserted_direction is not None and asserted_direction != direction:
-        return None
+        raise DirectionMismatchError(asserted=asserted_direction, actual=direction)
 
     if direction == "uplink":
         return None
