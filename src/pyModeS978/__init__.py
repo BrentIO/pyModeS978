@@ -1,4 +1,4 @@
-from . import _aux_sv, _frame, _mode_status, _state_vector
+from . import _aux_sv, _frame, _mode_status, _state_vector, _uncertainty
 
 __version__ = "9999.99.99"
 
@@ -28,8 +28,18 @@ def decode(raw: str) -> dict | None:
 
     if payload_type in _MS_TYPES:
         result.update(_mode_status.decode(frame.payload))
+        result.update(
+            _uncertainty.derive(
+                nic=result["nic"],
+                nic_supplement=result["nic_supplement"],
+                nac_p=result["nac_p"],
+                nac_v=result["nac_v"],
+                sil=result["sil"],
+            )
+        )
     else:
         result.update(dict.fromkeys(_mode_status.FIELDS))
+        result.update(dict.fromkeys(_uncertainty.FIELDS))
 
     if payload_type in _AUXSV_TYPES:
         result.update(_aux_sv.decode(frame.payload))
