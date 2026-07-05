@@ -113,8 +113,8 @@ Malformed input to `decode()` raises one of three `DecodeError` subclasses, rath
 `except ValueError:` catches any of them:
 
 - `InvalidHexError`: the input contains non-hex characters, or an odd number of hex characters.
-- `InvalidLengthError`: the decoded payload isn't 18, 34, or 432 bytes.
-- `DirectionMismatchError`: the `-`/`+` prefix disagrees with the direction implied by the payload's byte length.
+- `InvalidLengthError`: the decoded input isn't 18, 34, or 432 bytes.
+- `DirectionMismatchError`: the `-`/`+` prefix disagrees with the direction implied by the input's byte length.
 
 Every error type carries the original input passed to `decode()` as `.raw`, unmodified. This is useful for
 correlating a failure back to its source record.
