@@ -56,25 +56,31 @@ example output (a long-frame ADS-B message: HDR + State Vector + Mode Status + A
     'callsign': 'N116FE',
     'squawk': None,
     'emergency': Emergency.NO_EMERGENCY,
-    'uat_version': 2,
+    'mops_version': 2,
     'sil': 3,
+    'sil_supplement': SILSupplement.PER_HOUR,
     'transmit_mso': 35,
+    'sda': 2,
     'nac_p': 10,
     'nac_v': 2,
     'nic_baro': True,
-    'has_cdti': True,
-    'has_acas': True,
-    'acas_ra_active': True,
+    'nic_supplement': False,
+    'gva': 2,
+    'single_antenna': False,
+    'uat_in': True,
+    'es_in': True,
+    'tcas_operational': True,
+    'tcas_ra_active': False,
     'ident_active': False,
     'atc_services': False,
-    'heading_type': 'true',
     'altitude_secondary': 37050,
     'altitude_secondary_type': 'geo',
 }
 ```
 
-`payload_type`, `address_qualifier`, `emitter_category`, and `emergency` are `IntEnum`s (still compare/hash
-equal to their plain-int value) with a fallback to the plain int for any raw value that isn't a named member.
+`payload_type`, `address_qualifier`, `emitter_category`, `emergency`, and `sil_supplement` are `IntEnum`s (still
+compare/hash equal to their plain-int value) with a fallback to the plain int for any raw value that isn't a
+named member.
 
 ## License
 

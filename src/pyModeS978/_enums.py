@@ -58,6 +58,11 @@ class Emergency(IntEnum):
     RESERVED_7 = 7
 
 
+class SILSupplement(IntEnum):
+    PER_HOUR = 0
+    PER_SAMPLE = 1
+
+
 def coerce(enum_cls: type[IntEnum], value: int) -> IntEnum | int:
     """`enum_cls(value)`, but falls back to the plain int for values with no named member."""
     try:
