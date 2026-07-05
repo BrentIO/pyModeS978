@@ -3,12 +3,6 @@
 A pure-Python decoder for UAT (978 MHz) frames — the sibling protocol to 1090 MHz ADS-B. `pyModeS` has no UAT
 support and no Python UAT decoder exists elsewhere, so this library implements the frame layout from scratch.
 
-## Status
-
-Core decoding (HDR, State Vector, Mode Status, AUX SV) is implemented. Test coverage against real-world
-captures (#7/#8) and PyPI publishing (#9) are still open. See the
-[issue tracker](https://github.com/BrentIO/pyModeS978/issues) for what's left.
-
 ## Install
 
 ```bash
@@ -93,6 +87,17 @@ example output (a long-frame ADS-B message: HDR + State Vector + Mode Status + A
 `payload_type`, `address_qualifier`, `category`, `emergency`, and `sil_supplement` are `IntEnum`s (still
 compare/hash equal to their plain-int value) with a fallback to the plain int for any raw value that isn't a
 named member.
+
+## Versioning & releases
+
+Versions are calendar-based, `YYYY.M.b` (year, month, per-month release count — no leading zeros, e.g.
+`2026.7.1`), matching the convention used across other BrentIO repos. The version isn't stored in a source
+file at all: `pyproject.toml` declares it `dynamic`, and [`hatch-vcs`](https://github.com/ofek/hatch-vcs)
+derives it from the git tag at build time. An untagged install (e.g. straight off `main`) falls back to a
+`0.1.devN+g<hash>` style dev version.
+
+Releases are cut via the **🚀 Release** GitHub Actions workflow (`workflow_dispatch`, takes a `version` input
+matching the format above), which validates the version, tags `main`, and creates a GitHub Release.
 
 ## License
 
