@@ -113,12 +113,12 @@ correlating a failure back to its input.
 
 ## Data dictionary
 
-Every field either library can return, alphabetical by field name:
+The table below lists every field either library can return, alphabetical by field name:
 
 - **pyModeS978 Field** — the field pyModeS978 returns. `❌` means that data simply isn't available from a UAT
   frame.
 - **pyModeS Equivalent** — the matching field in pyModeS's 1090 `decode()` output. `❌` means the reverse —
-  pyModeS has nothing comparable.
+  1090 has nothing directly comparable.
 - **Payload Types** — which `payload_type` values a field's block is structurally present for. `—` for
   pyModeS-only fields, since they don't exist in `decode()`'s output at all.
 - **Notes** — everything else: finer per-frame conditions like ground/airborne-only, or when a field resolves
