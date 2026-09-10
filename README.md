@@ -308,4 +308,4 @@ matching the format above), which validates the version, tags `main`, and create
 
 ## License
 
-MIT — see [LICENSE](LICENSE).
+GPL-3.0-or-later — see [LICENSE](LICENSE).
