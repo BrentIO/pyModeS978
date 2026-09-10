@@ -7,7 +7,7 @@ name = "pyModeS978"
 dynamic = ["version"]
 description = "Pure-Python decoder for UAT (978 MHz) frames"
 readme = "README.md"
-license = "MIT"
+license = "GPL-3.0-or-later"
 requires-python = ">=3.14"
 authors = [
     { name = "Brent I/O" },
